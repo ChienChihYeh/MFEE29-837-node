@@ -6,8 +6,11 @@ const express = require('express')
 const app = express()
 //讀寫檔案
 const fs = require('fs').promises
+//類似fetch
 const axios = require('axios');
+//時間格式
 const moment = require('moment-timezone');
+//資料庫
 const db = require(__dirname + '/modules/db_connect2.js');
 
 
@@ -31,6 +34,7 @@ const upload = require(__dirname + '/modules/upload-img')
 app.get('/',(req,res)=>{
     res.send('歡迎來到express')
 })
+
 
 app.use('/member',require(__dirname + '/routes/member'))
 app.use('/product',require(__dirname + '/routes/product'))
