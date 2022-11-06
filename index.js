@@ -12,6 +12,7 @@ const axios = require('axios');
 const moment = require('moment-timezone');
 //資料庫
 const db = require(__dirname + '/modules/db_connect2.js');
+const cors = require("cors");
 
 
 
@@ -25,6 +26,7 @@ const corsOptions = {
     }
 };
 app.use(cors(corsOptions))
+
 //解析urlencoded,json
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
