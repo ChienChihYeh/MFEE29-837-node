@@ -30,7 +30,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions))
 
-//解析urlencoded,json
+//top-Level middleware
+//解析urlencoded,json放到req.body裡
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 //上傳圖片
