@@ -8,10 +8,7 @@ router.get('/all',async (req,res)=>{
     res.json(rows);
 })
 
-router.post('/',upload.none(),async(req,res)=>{
-    const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand} AND product_price>=${req.body.lowPrice} AND product_price<=${req.body.highPrice}`)
-    res.json(rows); 
-})
+
 
 
 router.post('/price',upload.none(),async(req,res)=>{
@@ -19,6 +16,18 @@ router.post('/price',upload.none(),async(req,res)=>{
     // ${req.body.lowPrice} 
     const [rows] = await db.query(`SELECT *  FROM product WHERE product_price BETWEEN   ${req.body.lowPrice}  AND ${req.body.highPrice}  `)
     res.json(rows);
+})
+
+router.post('/brand',upload.none(),async(req,res)=>{
+    const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand}`)
+    res.json(rows); 
+})
+
+
+
+router.post('/price&brand',upload.none(),async(req,res)=>{
+    const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand} AND product_price>=${req.body.lowPrice} AND product_price<=${req.body.highPrice}`)
+    res.json(rows); 
 })
 
 module.exports = router;
