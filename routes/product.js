@@ -25,7 +25,7 @@ router.post('/price',upload.none(),async(req,res)=>{
 })
 
 
-router.post('/price&branch',upload.none(),async(req,res)=>{
+router.post('/price&brand',upload.none(),async(req,res)=>{
     const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand} AND product_price>=${req.body.lowPrice} AND product_price<=${req.body.highPrice}`)
     res.json(rows); 
 })
