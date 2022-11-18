@@ -2,15 +2,18 @@ const express = require('express');
 const router = express.Router();
 const db = require(__dirname + '/../modules/db_connect2.js');
 const upload = require(__dirname + '/../modules/upload-img')
+const fs = require('fs');
 
 router.get('/api', async (req, res)=>{
     const sql = `SELECT * FROM members WHERE member_sid = ?`;
     [rows] = await db.query(sql, [req.query.id]);
-    
-    return {rows};
+    // return {rows};
+    res.send({rows});
 })
 
 router.post('/api', upload.none(), async (req, res)=>{
+
+// res.json(req.body);
 
     const output = {
         success: false,
@@ -20,7 +23,7 @@ router.post('/api', upload.none(), async (req, res)=>{
         //for debug
     }
 
-    const sql = "INSERT INTO `members`(`name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+    const sql = "INSERT INTO `members`(`name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `intro`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     const [result] = await db.query(sql, [
         req.body.name,
@@ -30,6 +33,7 @@ router.post('/api', upload.none(), async (req, res)=>{
         req.body.address,
         req.body.birthday,
         req.body.nickname,
+        req.body.intro
     ]);
 
     console.log(result);
@@ -49,17 +53,32 @@ router.put('/api', upload.single('avatar'), async (req, res)=>{
         //for debug
     }
 
-    const sql = "UPDATE `members` SET `name`=?,`password`=?,`email`=?,`mobile`=?,`address`=?,`birthday`=?,`nickname`=? WHERE `member_sid` =?";
+    const sql = "UPDATE `members` SET `name`=?,`email`=?,`mobile`=?,`address`=?,`birthday`=?,`nickname`=?, `avatar`=?, `intro`=? WHERE `member_sid` =?";
+
+    let avatarFilename = '';
+
+    if(req.file){
+        avatarFilename = req.file.filename;
+
+        fs.unlink(__dirname + `/../public/uploads/${req.body.prevAvatar}`, (err) => {
+            if (err) throw err //handle your error the way you want to;
+            console.log('old avatar was deleted');//or else the file will be deleted
+              });
+    }
+ 
+    console.log('avatar:' + avatarFilename);
 
     const [result] = await db.query(sql, [
         req.body.name,
-        req.body.password,
         req.body.email,
         req.body.mobile,
         req.body.address,
-        req.body.birthday,
+        req.body.birthday,  
         req.body.nickname,
-        req.params.sid
+        avatarFilename,
+        req.body.intro,
+        req.query.id
+        // req.params.sid
     ]);
 
     console.log(result);
