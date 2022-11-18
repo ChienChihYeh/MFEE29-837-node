@@ -7,6 +7,10 @@ router.get('/all',async (req,res)=>{
     const [rows] = await db.query('SELECT * FROM product')
     res.json(rows);
 })
+router.get('/random',async (req,res)=>{
+    const [rows] = await db.query('SELECT * FROM product ORDER BY RAND() LIMIT 3')
+    res.json(rows);
+})
 
 
 router.post('/brand',upload.none(),async(req,res)=>{
