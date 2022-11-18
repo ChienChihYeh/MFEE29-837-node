@@ -107,11 +107,10 @@ router.put("/api/pass", upload.none(), async (req, res) => {
 
   if (rows[0].password && rows[0].password === req.body.password ) {
     const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?";
-    const result = await db.query(sql, [req.body.newPass, req.query.id]);
+    const [result] = await db.query(sql, [req.body.newPass, req.query.id]);
     if (result.affectedRows) output.success = true;
     // console.log(result);
     // console.log(result.affectedRows);
-    // bug: outout.success is still false when update is successful
   }
 
   res.json(output);
