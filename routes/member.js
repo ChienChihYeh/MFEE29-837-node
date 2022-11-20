@@ -4,6 +4,7 @@ const db = require(__dirname + "/../modules/db_connect2.js");
 const upload = require(__dirname + "/../modules/upload-img");
 const fs = require("fs");
 const jwt = require('jsonwebtoken');
+const { nextTick } = require("process");
 
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
@@ -12,9 +13,8 @@ const jwt = require('jsonwebtoken');
 //   res.send({ rows });
 // });
 
-router.get("/api", async (req, res)=> {
-
-  let mid = 'no token';
+router.use("/api", async (req, res)=>{
+  let mid = '';
 
   function getToken(req) {
     if (
@@ -44,11 +44,22 @@ router.get("/api", async (req, res)=> {
       
     });   
   }
+  res.body.mid = mid;
+  if(mid === ''){
+    res.send('Invalid Token')
+  }
+
+  next();
+
+})
+
+router.get("/api", async (req, res)=> {
+
  
   // console.log(mid);
 
   const sql = `SELECT * FROM members WHERE member_sid = ?`;
-  [rows] = await db.query(sql, mid);
+  [rows] = await db.query(sql, req.body.mid);
   res.send({ rows });
 
 })
@@ -77,7 +88,7 @@ router.post("/login/api", upload.none(), async (req, res) => {
 });
 
 
-router.post("/api", upload.none(), async (req, res) => {
+router.post("join/api", upload.none(), async (req, res) => {
   // res.json(req.body);
 
   const output = {
@@ -148,7 +159,7 @@ router.put("/api", upload.single("avatar"), async (req, res) => {
     req.body.nickname,
     avatarFilename,
     req.body.intro,
-    req.query.id,
+    req.body.mid,
     // req.params.sid
   ]);
 
