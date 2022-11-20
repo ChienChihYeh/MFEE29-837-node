@@ -34,8 +34,9 @@ router.use("/api", async (req, res, next)=>{
   if(token !== '') {
     jwt.verify(token, 'hiking1214', function (err, decoded) {
       if (err) {
+        return;
         // throw err;
-        res.send('invalid token')
+        // res.send('invalid token')
       } else {
         mid = decoded.member_sid;
       }
@@ -45,7 +46,7 @@ router.use("/api", async (req, res, next)=>{
   
   req.body.mid = mid;
   if(mid === ''){
-    res.send('invalid token')
+    return;
   }
   next();
 })
@@ -177,11 +178,11 @@ router.put("/api/pass", upload.none(), async (req, res) => {
 
   const sqlVer = "SELECT `password` from members WHERE member_sid = ?";
 
-  const [rows] = await db.query(sqlVer, [req.query.id]);
+  const [rows] = await db.query(sqlVer, [req.body.mid]);
 
   if (rows[0].password && rows[0].password === req.body.password ) {
     const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?";
-    const [result] = await db.query(sql, [req.body.newPass, req.query.id]);
+    const [result] = await db.query(sql, [req.body.newPass, req.body.mid]);
     if (result.affectedRows) output.success = true;
     // console.log(result);
     // console.log(result.affectedRows);
