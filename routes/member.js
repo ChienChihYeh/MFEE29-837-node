@@ -3,13 +3,79 @@ const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2.js");
 const upload = require(__dirname + "/../modules/upload-img");
 const fs = require("fs");
+const jwt = require('jsonwebtoken');
 
-router.get("/api", async (req, res) => {
+// router.get("/api", async (req, res) => {
+//   const sql = `SELECT * FROM members WHERE member_sid = ?`;
+//   [rows] = await db.query(sql, [req.query.id]);
+//   // return {rows};
+//   res.send({ rows });
+// });
+
+router.get("/api", async (req, res)=> {
+
+  let mid = 'no token';
+
+  function getToken(req) {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.split(" ")[0] === "Bearer"
+    ) {
+      return req.headers.authorization.split(" ")[1];
+    } 
+    return null;
+  }
+
+  const token = getToken(req) || '';
+
+  // if (!token) {
+  //   throw new Error("Authorization token is required");
+  // }
+  if(token !== '') {
+    jwt.verify(token, 'hiking1214', function (err, decoded) {
+      if (err) {
+        // throw err;
+        return;
+      } else {
+        mid = decoded.member_sid;
+      }
+      // console.log(decoded);
+      
+      
+    });   
+  }
+ 
+  // console.log(mid);
+
   const sql = `SELECT * FROM members WHERE member_sid = ?`;
-  [rows] = await db.query(sql, [req.query.id]);
-  // return {rows};
+  [rows] = await db.query(sql, mid);
   res.send({ rows });
+
+})
+
+router.post("/login/api", upload.none(), async (req, res) => {
+  const sql = "SELECT * FROM `members` WHERE `email` = ?";
+  const output = {
+      success: false,
+      member_sid: '',
+      token: '',
+  }
+
+  const [result] = await db.query(sql, [req.body.email]);
+
+  if(req.body.password && req.body.password === result[0].password) {
+
+    const token = jwt.sign({member_sid : result[0].member_sid}, 'hiking1214')
+
+    output.member_sid = result[0].member_sid;
+    output.success = true;
+    output.token = token;
+  }
+
+  res.json(output);
+
 });
+
 
 router.post("/api", upload.none(), async (req, res) => {
   // res.json(req.body);
