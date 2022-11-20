@@ -23,7 +23,7 @@ router.use("/api", async (req, res, next)=>{
     ) {
       return req.headers.authorization.split(" ")[1];
     } 
-    return null;
+    return;
   }
 
   const token = getToken(req) || '';
@@ -36,7 +36,7 @@ router.use("/api", async (req, res, next)=>{
       if (err) {
         return;
         // throw err;
-        // res.send('invalid token')
+        
       } else {
         mid = decoded.member_sid;
       }
