@@ -13,7 +13,7 @@ const { nextTick } = require("process");
 //   res.send({ rows });
 // });
 
-router.use("/api", async (req, res)=>{
+router.use("/api", async (req, res, next)=>{
   let mid = '';
 
   function getToken(req) {
@@ -35,22 +35,19 @@ router.use("/api", async (req, res)=>{
     jwt.verify(token, 'hiking1214', function (err, decoded) {
       if (err) {
         // throw err;
-        return;
+        res.send('invalid token')
       } else {
         mid = decoded.member_sid;
       }
       // console.log(decoded);
-      
-      
     });   
   }
-  res.body.mid = mid;
+  
+  req.body.mid = mid;
   if(mid === ''){
-    res.send('Invalid Token')
+    res.send('invalid token')
   }
-
   next();
-
 })
 
 router.get("/api", async (req, res)=> {
