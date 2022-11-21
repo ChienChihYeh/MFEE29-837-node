@@ -176,6 +176,8 @@ router.put("/api/pass", upload.none(), async (req, res) => {
     //for debug
   };
 
+  console.log(1)
+
   const sqlVer = "SELECT `password` from members WHERE member_sid = ?";
 
   const [rows] = await db.query(sqlVer, [req.body.mid]);
