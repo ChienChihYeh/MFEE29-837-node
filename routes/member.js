@@ -4,6 +4,8 @@ const db = require(__dirname + "/../modules/db_connect2.js")
 const upload = require(__dirname + "/../modules/upload-img")
 const fs = require("fs")
 const jwt = require("jsonwebtoken")
+const { dirname } = require("path")
+const sharp = require('sharp');
 const { auth } = require(__dirname + "/../modules/auth.js")
 
 // router.get("/api", async (req, res) => {
@@ -128,23 +130,31 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
 
   let avatarFilename = req.body.prevAvatar
 
-  console.log(avatarFilename)
+  console.log("old avatar:" + avatarFilename)
+
 
   if (req.file) {
     avatarFilename = req.file.filename
+
+    const path = ("../public/uploads/" + avatarFilename)
+  
+    // console.log(req.file.path) 
+
+    sharp(req.file.path).resize({
+      fit: sharp.fit.contain,
+      width: 200
+  }).toFile(__dirname+ '/../public/uploads/thumb_' + req.file.filename)
 
     if (req.body.prevAvatar) {
       fs.unlink(
         __dirname + `/../public/uploads/${req.body.prevAvatar}`,
         (err) => {
           // if (err) throw err; //handle your error the way you want to;
-          console.log("old avatar was deleted") //or else the file will be deleted
+          //or else the file will be deleted
         }
       )
     }
   }
-
-  console.log("avatar:" + avatarFilename)
 
   if(res.locals.loginUser){
     mid = res.locals.loginUser.member_sid
