@@ -11,13 +11,12 @@ async function getListData(req){
     
     return {rows};
 }
-
 router.get('/api', async (req, res)=>{
     res.json(await getListData(req));
 });
 
 
-//商品細節頁搜尋
+//商品細節內頁
 async function getDetailData(req){
     const {rental_product_sid} = req.params
     const sql = `SELECT * FROM rental where rental_product_sid =${rental_product_sid}`;
@@ -28,8 +27,24 @@ async function getDetailData(req){
 
 router.get('/getDetailData/:rental_product_sid', async (req, res)=>{
     res.json(await getDetailData(req));
-    // console.log(req.params)
-    // res.json(req.params);
+});
+
+
+
+
+
+//商品名稱模糊搜尋
+async function getSearchData(req){
+    const{search} = req.query
+    const sql = `SELECT * FROM rental where rental_product_name LIKE "%${search}%"`;
+    [rows] = await db.query(sql);
+    console.log(sql);
+    return {rows};
+}
+
+router.get('/getSearchData', async (req, res)=>{
+    res.json(await getSearchData(req));
+    
 });
 module.exports = router;
 
