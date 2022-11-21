@@ -153,6 +153,13 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
           //or else the file will be deleted
         }
       )
+      fs.unlink(
+        __dirname + `/../public/uploads/thumb_${req.body.prevAvatar}`,
+        (err) => {
+          // if (err) throw err; //handle your error the way you want to;
+          //or else the file will be deleted
+        }
+      )
     }
   }
 
