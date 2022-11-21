@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const db = require(__dirname + "/../modules/db_connect2.js");
-const upload = require(__dirname + "/../modules/upload-img");
-const fs = require("fs");
-const jwt = require("jsonwebtoken");
+const express = require("express")
+const router = express.Router()
+const db = require(__dirname + "/../modules/db_connect2.js")
+const upload = require(__dirname + "/../modules/upload-img")
+const fs = require("fs")
+const jwt = require("jsonwebtoken")
+const { auth } = require(__dirname + "/../modules/auth.js")
 
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
@@ -13,29 +14,29 @@ const jwt = require("jsonwebtoken");
 // });
 
 router.post("/login/api", upload.none(), async (req, res) => {
-  const sql = "SELECT * FROM `members` WHERE `email` = ?";
+  const sql = "SELECT * FROM `members` WHERE `email` = ?"
   const output = {
     success: false,
     member_sid: "",
     token: "",
-  };
+  }
 
-  const [result] = await db.query(sql, [req.body.email]);
+  const [result] = await db.query(sql, [req.body.email])
 
   if (
     result[0] &&
     req.body.password &&
     req.body.password === result[0].password
   ) {
-    const token = jwt.sign({ member_sid: result[0].member_sid }, "hiking1214");
+    const token = jwt.sign({ member_sid: result[0].member_sid }, "hiking1214")
 
-    output.member_sid = result[0].member_sid;
-    output.success = true;
-    output.token = token;
+    output.member_sid = result[0].member_sid
+    output.success = true
+    output.token = token
   }
 
-  res.json(output);
-});
+  res.json(output)
+})
 
 router.post("/join/api", upload.none(), async (req, res) => {
   // res.json(req.body);
@@ -45,11 +46,12 @@ router.post("/join/api", upload.none(), async (req, res) => {
     code: 0,
     error: {},
     postData: req.body,
+    token: "",
     //for debug
-  };
+  }
 
   const sql =
-    "INSERT INTO `members`(`name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `intro`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    "INSERT INTO `members`(`name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `intro`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
 
   const [result] = await db.query(sql, [
     req.body.name,
@@ -60,77 +62,93 @@ router.post("/join/api", upload.none(), async (req, res) => {
     req.body.birthday,
     req.body.nickname,
     req.body.intro,
-  ]);
+  ])
 
-  console.log(result);
+  console.log(result)
 
-  if (result.affectedRows) output.success = true;
+  const sqlNew = "SELECT * FROM `members` WHERE `email` = ?"
+  const [resultNew] = await db.query(sqlNew, [req.body.email])
+  const token = jwt.sign({ member_sid: resultNew[0].member_sid }, "hiking1214")
 
-  res.json(output);
-});
+  if (result.affectedRows) {
+    output.success = true
+    output.token = token
+  }
 
-router.use("/api", (req, res, next) => {
-  const auth = req.get("Authorization");
+  res.json(output)
+})
 
-  //console.log({auth}); // { auth: 'Bearer null' }
+// router.use("/api", (req, res, next) => {
+//   const auth = req.get("Authorization")
 
-  res.locals.loginUser = null;
-  try {
-    if (auth && auth.indexOf("Bearer ") === 0) {
-      const token = auth.slice(7);
-      if (token && token.length) {
-        res.locals.loginUser = jwt.verify(token, "hiking1214");
-      }
-    }
-  } catch (ex) {}
+//   //console.log({auth}); // { auth: 'Bearer null' }
 
-  next();
-});
+//   res.locals.loginUser = null
+//   try {
+//     if (auth && auth.indexOf("Bearer ") === 0) {
+//       const token = auth.slice(7)
+//       if (token && token.length) {
+//         res.locals.loginUser = jwt.verify(token, "hiking1214")
+//       }
+     
+//     }
+//     next()
+//   } catch (ex) {
+//     res.json("invalid token")
+//   }
+  
+// })
 
-router.get("/api", async (req, res) => {
+router.get("/api", auth, async (req, res) => {
   // console.log(mid);
 
-  let mid = 0;
+  let mid = 0
 
   if (res.locals.loginUser) {
-    mid = res.locals.loginUser.member_sid;
-    const sql = `SELECT * FROM members WHERE member_sid = ?`;
-    [rows] = await db.query(sql, mid);
-    res.send({ rows });
+    mid = res.locals.loginUser.member_sid
+    const sql = `SELECT * FROM members WHERE member_sid = ?`
+    ;[rows] = await db.query(sql, mid)
+    res.json({ rows })
   }
-});
+})
 
-router.put("/api", upload.single("avatar"), async (req, res) => {
+router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
   const output = {
     success: false,
     code: 0,
     error: {},
     postData: req.body,
     //for debug
-  };
+  }
+
+  let mid = 0
 
   const sql =
-    "UPDATE `members` SET `name`=?,`email`=?,`mobile`=?,`address`=?,`birthday`=?,`nickname`=?, `avatar`=?, `intro`=? WHERE `member_sid` =?";
+    "UPDATE `members` SET `name`=?,`email`=?,`mobile`=?,`address`=?,`birthday`=?,`nickname`=?, `avatar`=?, `intro`=? WHERE `member_sid` =?"
 
-  let avatarFilename = req.body.prevAvatar;
+  let avatarFilename = req.body.prevAvatar
 
-  console.log(avatarFilename);
+  console.log(avatarFilename)
 
   if (req.file) {
-    avatarFilename = req.file.filename;
+    avatarFilename = req.file.filename
 
     if (req.body.prevAvatar) {
       fs.unlink(
         __dirname + `/../public/uploads/${req.body.prevAvatar}`,
         (err) => {
           // if (err) throw err; //handle your error the way you want to;
-          console.log("old avatar was deleted"); //or else the file will be deleted
+          console.log("old avatar was deleted") //or else the file will be deleted
         }
-      );
+      )
     }
   }
 
-  console.log("avatar:" + avatarFilename);
+  console.log("avatar:" + avatarFilename)
+
+  if(res.locals.loginUser){
+    mid = res.locals.loginUser.member_sid
+  }
 
   const [result] = await db.query(sql, [
     req.body.name,
@@ -141,17 +159,17 @@ router.put("/api", upload.single("avatar"), async (req, res) => {
     req.body.nickname,
     avatarFilename,
     req.body.intro,
-    res.locals.loginUser.member_sid,
+    mid,
     // req.params.sid
-  ]);
+  ])
 
-  console.log(result);
+  console.log(result)
 
-  if (result.affectedRows) output.success = true;
-  res.json(output);
-});
+  if (result.affectedRows) output.success = true
+  res.json(output)
+})
 
-router.put("/api/pass", upload.none(), async (req, res) => {
+router.put("/api/pass", [auth, upload.none()], async (req, res) => {
   // return res.json(res.locals.loginUser.member_sid)
   // 測試傳過來的body
 
@@ -161,26 +179,26 @@ router.put("/api/pass", upload.none(), async (req, res) => {
     error: {},
     postData: req.body,
     //for debug
-  };
+  }
 
   // console.log(res.locals.loginUser.member_sid)
 
-  const sqlVer = "SELECT `password` from members WHERE member_sid = ?";
+  const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
 
-  const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid]);
+  const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
 
   if (rows[0] && rows[0].password === req.body.password) {
-    const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?";
+    const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
     const [result] = await db.query(sql, [
       req.body.newPass,
       res.locals.loginUser.member_sid,
-    ]);
-    if (result.affectedRows) output.success = true;
+    ])
+    if (result.affectedRows) output.success = true
     // console.log(result);
     // console.log(result.affectedRows);
   }
 
-  res.json(output);
-});
+  res.json(output)
+})
 
-module.exports = router;
+module.exports = router
