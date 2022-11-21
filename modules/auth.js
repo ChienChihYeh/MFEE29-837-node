@@ -20,7 +20,7 @@ const auth = function (req, res, next) {
   if(res.locals.loginUser){
     next()
   } else {
-    return res.json("invalid token")
+    return res.send("invalid token")
   }
 
 }
