@@ -80,6 +80,18 @@ router.post("/join/api", upload.none(), async (req, res) => {
   res.json(output)
 })
 
+router.get("/profile/api", async (req, res) => {
+  mid = req.query.mid
+ 
+  const sql = 'SELECT member_sid, nickname, avatar, intro FROM `members` WHERE member_sid = ?'
+  const [rows] = await db.query(sql, mid)
+  // console.log({rows});
+  res.json({rows})
+
+
+})
+
+
 // router.use("/api", (req, res, next) => {
 //   const auth = req.get("Authorization")
 
@@ -109,7 +121,7 @@ router.get("/api", auth, async (req, res) => {
   if (res.locals.loginUser) {
     mid = res.locals.loginUser.member_sid
     const sql = `SELECT * FROM members WHERE member_sid = ?`
-    ;[rows] = await db.query(sql, mid)
+    const [rows] = await db.query(sql, mid)
     res.json({ rows })
   }
 })
