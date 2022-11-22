@@ -80,6 +80,41 @@ router.post("/join/api", upload.none(), async (req, res) => {
   res.json(output)
 })
 
+router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body,
+    token: "",
+    //for debug
+  }
+
+  let mid = 0
+
+  if(res.locals.loginUser) {
+    mid = res.locals.loginUser.member_sid
+  }
+
+  const sql = "INSERT INTO `posts`(`member_sid`, `image_url`, `context`, `mountain_sid`) VALUES (?, ?, ?, ?)"
+
+  const [result] = await db.query(sql, [mid, req.file.filename, req.body.context, req.body.mountain_sid])
+
+  if (result.affectedRows) output.success = true
+  res.json(output)
+
+})
+
+router.get("/post/api", async (req, res) => {
+  let mid = req.query.mid
+
+  const sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid WHERE member_sid = ?"
+  const [rows] = await db.query(sql, mid)
+  
+  res.json(rows)
+})
+
+
 router.get("/profile/api", async (req, res) => {
   mid = req.query.mid
  
@@ -91,6 +126,20 @@ router.get("/profile/api", async (req, res) => {
 
 })
 
+router.get("/locations/api", async (req, res)=> {
+  const [rows] = await db.query("SELECT * FROM `location` WHERE 1")
+  // console.log(rows)
+  res.json({rows})
+
+})
+
+router.get("/mountains/api", async (req, res)=> {
+  const sql = "SELECT * FROM `mountain` WHERE location_sid=?"
+  const [rows] = await db.query(sql, req.query.id)
+  // console.log(rows)
+  res.json({rows})
+
+})
 
 // router.use("/api", (req, res, next) => {
 //   const auth = req.get("Authorization")
