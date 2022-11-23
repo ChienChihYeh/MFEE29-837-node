@@ -189,8 +189,8 @@ router.put("/post/api", [auth, upload.none()], async(req, res) => {
   if(res.locals.loginUser) {
     mid = res.locals.loginUser.member_sid
   }
-  const sql = "UPDATE `posts` SET `context` = ? WHERE sid = ?"
-  const [result] = await db.query(sql, [req.body.context, req.body.sid])
+  const sql = "UPDATE `posts` SET `context` = ? WHERE post_sid = ?"
+  const [result] = await db.query(sql, [req.body.context, req.body.post_sid])
 
   if (result.affectedRows) output.success = true
   res.json(output)
