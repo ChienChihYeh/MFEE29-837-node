@@ -82,6 +82,7 @@ router.post("/join/api", upload.none(), async (req, res) => {
 
 router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) => {
   const output = {
+    update: false,
     success: false,
     code: 0,
     error: {},
@@ -95,13 +96,24 @@ router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) =
   if(res.locals.loginUser) {
     mid = res.locals.loginUser.member_sid
   }
-
+  
+  //save new post
   const sql = "INSERT INTO `posts`(`member_sid`, `image_url`, `context`, `mountain_sid`) VALUES (?, ?, ?, ?)"
 
   const [result] = await db.query(sql, [mid, req.file.filename, req.body.context, req.body.mountain_sid])
 
-  if (result.affectedRows) output.success = true
+  if(result.affectedRows) output.update = true
+
+  //update total_height
+  if(!output.update) return res.json(output)
+
+  const sqlM = "UPDATE `members` SET `total_height` = `total_height` + ? WHERE `member_sid` = ?"
+
+  const [resultM] = await db.query(sqlM, [req.body.height, mid])
+
+  if (result.affectedRows && resultM.affectedRows) output.success = true
   res.json(output)
+
 
 })
 
@@ -113,7 +125,6 @@ router.get("/post/api", async (req, res) => {
   
   res.json(rows)
 })
-
 
 router.get("/profile/api", async (req, res) => {
   mid = req.query.mid
@@ -161,6 +172,57 @@ router.get("/mountains/api", async (req, res)=> {
 //   }
   
 // })
+
+router.put("/post/api", [auth, upload.none()], async(req, res) => {
+  let mid = 0
+ 
+  console.log(req.body.context)
+   
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body,
+    //for debug
+  }
+
+  if(res.locals.loginUser) {
+    mid = res.locals.loginUser.member_sid
+  }
+  const sql = "UPDATE `posts` SET `context` = ? WHERE sid = ?"
+  const [result] = await db.query(sql, [req.body.context, req.body.sid])
+
+  if (result.affectedRows) output.success = true
+  res.json(output)
+
+})
+
+router.delete("/post/api", [auth, upload.none()], async(req, res) => {
+  const output = {
+    update: false,
+    success: false,
+    code: 0,
+    error: {},
+    //for debug
+  }
+
+  const sql = "DELETE FROM `posts` WHERE post_sid = ?"
+
+  const [result] = await db.query(sql, req.query.sid)
+
+  if(result.affectedRows) output.update = true
+
+  if(!output.update) return res.json(output)
+
+  const sqlM = "UPDATE `members` SET `total_height` = `total_height` - ? WHERE `member_sid` = ?"
+
+  const [resultM] = await db.query(sqlM, [req.query.height ,res.locals.loginUser.member_sid])
+
+  if (result.affectedRows && resultM.affectedRows) output.success = true
+  res.json(output)
+
+
+})
 
 router.get("/api", auth, async (req, res) => {
   // console.log(mid);
