@@ -96,6 +96,11 @@ router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) =
   if(res.locals.loginUser) {
     mid = res.locals.loginUser.member_sid
   }
+
+  sharp(req.file.path).resize({
+    fit: sharp.fit.contain,
+    width: 400
+}).toFile(__dirname+ '/../public/uploads/thumb_' + req.file.filename)
   
   //save new post
   const sql = "INSERT INTO `posts`(`member_sid`, `image_url`, `context`, `mountain_sid`) VALUES (?, ?, ?, ?)"
@@ -117,6 +122,100 @@ router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) =
 
 })
 
+router.post("/like/api", [auth, upload.none()], async (req, res) => {
+  // res.json({mid: req.body.mid, pid: req.body.pid})
+
+  const output = {
+    update: false,
+    success: false
+  }
+
+  const mid = req.body.mid
+  const pid = req.body.pid
+
+  const sql = "INSERT INTO `likes`(`member_sid`, `post_sid`) VALUES (?,?)"
+
+  const [result] = await db.query(sql, [mid, pid])
+
+  if (result.affectedRows) output.update = true
+
+  if(!output.update) return res.json(output)
+
+  const sqlP = "UPDATE `posts` SET `likes` = `likes` + 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, pid)
+
+  if (resultP.affectedRows) output.success = true
+
+  res.json(output)
+
+})
+
+router.post("/reply/api", [auth, upload.none()], async (req, res) => {
+  // res.json(req.body)
+  const output = {
+    success: false
+  }
+
+  const sql = "INSERT INTO `replies`(`post_sid`, `member_sid`, `context`) VALUES (?, ?, ?)"
+
+  const [result] = await db.query(sql, [req.body.post_sid, req.body.member_sid, req.body.context])
+
+  if(result.affectedRows) output.success = true
+
+  res.json(output)
+
+})
+
+router.get("/reply/api", async (req, res)=>{
+  const pid = req.query.pid
+
+  const sql = "SELECT replies.context, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+ 
+  const [rows] = await db.query(sql, pid)
+
+  res.json(rows)
+
+})
+
+router.get("/like/api", async (req, res)=> {
+    // res.json(req.query.mid)
+    let mid = req.query.mid || 0
+    let pid = req.query.pid || 0
+
+    const sql = "SELECT * FROM `likes` WHERE member_sid = ? && post_sid = ?"
+
+    const [rows] = await db.query(sql, [mid, pid])
+
+    console.log(rows);
+
+    res.json(rows)
+})
+
+router.delete("/like/api", async (req, res)=> {
+  const mid = req.query.mid
+  const pid = req.query.pid
+  const output = {
+    update: false,
+    success: false,
+  }
+
+  const sql = "DELETE FROM `likes` WHERE member_sid = ? AND post_sid = ?" 
+
+  const [result] = await db.query(sql, [mid, pid])
+
+  if(result.affectedRows) output.update = true
+
+  const sqlP = "UPDATE `posts` SET `likes` = `likes` - 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, pid)
+
+  if (resultP.affectedRows) output.success = true
+
+  res.json(output)
+
+})
+
 router.get("/post/api", async (req, res) => {
   let mid = req.query.mid
 
@@ -126,8 +225,20 @@ router.get("/post/api", async (req, res) => {
   res.json(rows)
 })
 
+router.get("/modal/api", async (req, res) => {
+  const mid = req.query.mid
+
+  const sql = "SELECT members.nickname, members.total_height, members.avatar FROM members WHERE member_sid = ?"
+  const [rows] = await db.query(sql, mid)
+
+  console.log(rows);
+
+  res.json(rows)
+
+})
+
 router.get("/profile/api", async (req, res) => {
-  mid = req.query.mid
+  const mid = req.query.mid
  
   const sql = 'SELECT member_sid, nickname, avatar, intro FROM `members` WHERE member_sid = ?'
   const [rows] = await db.query(sql, mid)
@@ -206,6 +317,23 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
     //for debug
   }
 
+  fs.unlink(
+    __dirname + `/../public/uploads/${req.query.image_url}`,
+    (err) => {
+      console.log(err)
+      // if (err) throw err; //handle your error the way you want to;
+      //or else the file will be deleted
+    }
+  )
+  fs.unlink(
+    __dirname + `/../public/uploads/thumb_${req.query.image_url}`,
+    (err) => {
+      // if (err) throw err; //handle your error the way you want to;
+      //or else the file will be deleted
+    }
+  )
+
+
   const sql = "DELETE FROM `posts` WHERE post_sid = ?"
 
   const [result] = await db.query(sql, req.query.sid)
@@ -218,8 +346,13 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
 
   const [resultM] = await db.query(sqlM, [req.query.height ,res.locals.loginUser.member_sid])
 
+  const sqlLike = "DELETE FROM `likes` WHERE post_sid = ?"
+
+  const [resultLike] = await db.query(sqlLike, req.query.sid)
+
   if (result.affectedRows && resultM.affectedRows) output.success = true
   res.json(output)
+
 })
 
 router.get("/api", auth, async (req, res) => {
@@ -275,7 +408,7 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
         }
       )
       fs.unlink(
-        __dirname + `/../public/uploads/thumb_${req.body.prevAvatar}`,
+        __dirname + `/../public/uploads/avatar_${req.body.prevAvatar}`,
         (err) => {
           // if (err) throw err; //handle your error the way you want to;
           //or else the file will be deleted
