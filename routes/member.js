@@ -151,6 +151,33 @@ router.post("/like/api", [auth, upload.none()], async (req, res) => {
 
 })
 
+router.post("/reply/api", [auth, upload.none()], async (req, res) => {
+  // res.json(req.body)
+  const output = {
+    success: false
+  }
+
+  const sql = "INSERT INTO `replies`(`post_sid`, `member_sid`, `context`) VALUES (?, ?, ?)"
+
+  const [result] = await db.query(sql, [req.body.post_sid, req.body.member_sid, req.body.context])
+
+  if(result.affectedRows) output.success = true
+
+  res.json(output)
+
+})
+
+router.get("/reply/api", async (req, res)=>{
+  const pid = req.query.pid
+
+  const sql = "SELECT replies.context, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+ 
+  const [rows] = await db.query(sql, pid)
+
+  res.json(rows)
+
+})
+
 router.get("/like/api", async (req, res)=> {
     // res.json(req.query.mid)
     let mid = req.query.mid || 0
@@ -163,6 +190,30 @@ router.get("/like/api", async (req, res)=> {
     console.log(rows);
 
     res.json(rows)
+})
+
+router.delete("/like/api", async (req, res)=> {
+  const mid = req.query.mid
+  const pid = req.query.pid
+  const output = {
+    update: false,
+    success: false,
+  }
+
+  const sql = "DELETE FROM `likes` WHERE member_sid = ? AND post_sid = ?" 
+
+  const [result] = await db.query(sql, [mid, pid])
+
+  if(result.affectedRows) output.update = true
+
+  const sqlP = "UPDATE `posts` SET `likes` = `likes` - 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, pid)
+
+  if (resultP.affectedRows) output.success = true
+
+  res.json(output)
+
 })
 
 router.get("/post/api", async (req, res) => {
@@ -295,9 +346,12 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
 
   const [resultM] = await db.query(sqlM, [req.query.height ,res.locals.loginUser.member_sid])
 
+  const sqlLike = "DELETE FROM `likes` WHERE post_sid = ?"
+
+  const [resultLike] = await db.query(sqlLike, req.query.sid)
+
   if (result.affectedRows && resultM.affectedRows) output.success = true
   res.json(output)
-
 
 })
 
