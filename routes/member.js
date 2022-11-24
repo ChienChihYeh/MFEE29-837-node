@@ -154,6 +154,7 @@ router.post("/like/api", [auth, upload.none()], async (req, res) => {
 router.post("/reply/api", [auth, upload.none()], async (req, res) => {
   // res.json(req.body)
   const output = {
+    update: false,
     success: false
   }
 
@@ -161,7 +162,15 @@ router.post("/reply/api", [auth, upload.none()], async (req, res) => {
 
   const [result] = await db.query(sql, [req.body.post_sid, req.body.member_sid, req.body.context])
 
-  if(result.affectedRows) output.success = true
+  if(result.affectedRows) output.update = true
+
+  if(!output.update) return res.json(output)
+
+  const sqlP = "UPDATE `posts` SET `comments` = `comments` + 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, req.body.post_sid) 
+
+  if(resultP.affectedRows) output.success = true
 
   res.json(output)
 
