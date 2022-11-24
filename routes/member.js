@@ -359,6 +359,11 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
 
   const [resultLike] = await db.query(sqlLike, req.query.sid)
 
+  
+  const sqlReply = "DELETE FROM `replies` WHERE post_sid = ?"
+
+  const [resultReply] = await db.query(sqlReply, req.query.sid)
+
   if (result.affectedRows && resultM.affectedRows) output.success = true
   res.json(output)
 
