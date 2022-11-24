@@ -16,6 +16,51 @@ router.use((req,res,next)=>{
     next()
 })
 
+
+router.get("/borad/api", async (req, res) => {
+    if(req.query.mid){
+        let mid = req.query.mid;
+        let mStr = 'member_sid =';
+        const sql = 'SELECT follows.follow_sid FROM `members` join `follows` on members.member_sid = follows.member_sid  WHERE members.member_sid = ?'
+        const [rows] = await db.query(sql, mid)
+    
+        const FollowsId = rows.map((v, i) => {
+            if(i+1 < rows.length  ){
+                mStr += `${v.follow_sid} OR member_sid = `
+            }else{
+                mStr +=`${v.follow_sid}`
+            }
+          })
+    
+          let reg =/\'|’|‘/g
+          let a =mStr.replace(reg,"")
+    
+          const sql2 = `SELECT * FROM members WHERE ${a}`
+          const [rows0] = await db.query(sql2)
+        //   console.log(mStr);
+        //   console.log(rows0);
+          
+        res.json(rows0)
+    }else{
+        return
+    }
+    
+  })
+
+
+
+
+
+  router.get("/borad/api2", async (req, res) => {
+    const sql = 'SELECT * FROM members  ORDER BY total_height  DESC LIMIT 5'
+    const [rows] = await db.query(sql)
+    res.json(rows)
+  })
+
+
+
+
+
 router.get('/all',async (req,res)=>{
     const [rows] = await db.query('SELECT * FROM product')
     res.json(rows);

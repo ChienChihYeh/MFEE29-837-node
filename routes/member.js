@@ -220,8 +220,6 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
 
   if (result.affectedRows && resultM.affectedRows) output.success = true
   res.json(output)
-
-
 })
 
 router.get("/api", auth, async (req, res) => {
