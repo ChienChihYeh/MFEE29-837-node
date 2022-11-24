@@ -96,6 +96,11 @@ router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) =
   if(res.locals.loginUser) {
     mid = res.locals.loginUser.member_sid
   }
+
+  sharp(req.file.path).resize({
+    fit: sharp.fit.contain,
+    width: 400
+}).toFile(__dirname+ '/../public/uploads/thumb_' + req.file.filename)
   
   //save new post
   const sql = "INSERT INTO `posts`(`member_sid`, `image_url`, `context`, `mountain_sid`) VALUES (?, ?, ?, ?)"
@@ -206,6 +211,23 @@ router.delete("/post/api", [auth, upload.none()], async(req, res) => {
     //for debug
   }
 
+  fs.unlink(
+    __dirname + `/../public/uploads/${req.query.image_url}`,
+    (err) => {
+      console.log(err)
+      // if (err) throw err; //handle your error the way you want to;
+      //or else the file will be deleted
+    }
+  )
+  fs.unlink(
+    __dirname + `/../public/uploads/thumb_${req.query.image_url}`,
+    (err) => {
+      // if (err) throw err; //handle your error the way you want to;
+      //or else the file will be deleted
+    }
+  )
+
+
   const sql = "DELETE FROM `posts` WHERE post_sid = ?"
 
   const [result] = await db.query(sql, req.query.sid)
@@ -277,7 +299,7 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
         }
       )
       fs.unlink(
-        __dirname + `/../public/uploads/thumb_${req.body.prevAvatar}`,
+        __dirname + `/../public/uploads/avatar_${req.body.prevAvatar}`,
         (err) => {
           // if (err) throw err; //handle your error the way you want to;
           //or else the file will be deleted
