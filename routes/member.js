@@ -122,6 +122,49 @@ router.post("/post/api", [ auth, upload.single("image_url")], async (req, res) =
 
 })
 
+router.post("/like/api", [auth, upload.none()], async (req, res) => {
+  // res.json({mid: req.body.mid, pid: req.body.pid})
+
+  const output = {
+    update: false,
+    success: false
+  }
+
+  const mid = req.body.mid
+  const pid = req.body.pid
+
+  const sql = "INSERT INTO `likes`(`member_sid`, `post_sid`) VALUES (?,?)"
+
+  const [result] = await db.query(sql, [mid, pid])
+
+  if (result.affectedRows) output.update = true
+
+  if(!output.update) return res.json(output)
+
+  const sqlP = "UPDATE `posts` SET `likes` = `likes` + 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, pid)
+
+  if (resultP.affectedRows) output.success = true
+
+  res.json(output)
+
+})
+
+router.get("/like/api", async (req, res)=> {
+    // res.json(req.query.mid)
+    let mid = req.query.mid || 0
+    let pid = req.query.pid || 0
+
+    const sql = "SELECT * FROM `likes` WHERE member_sid = ? && post_sid = ?"
+
+    const [rows] = await db.query(sql, [mid, pid])
+
+    console.log(rows);
+
+    res.json(rows)
+})
+
 router.get("/post/api", async (req, res) => {
   let mid = req.query.mid
 
@@ -131,8 +174,20 @@ router.get("/post/api", async (req, res) => {
   res.json(rows)
 })
 
+router.get("/modal/api", async (req, res) => {
+  const mid = req.query.mid
+
+  const sql = "SELECT members.nickname, members.total_height, members.avatar FROM members WHERE member_sid = ?"
+  const [rows] = await db.query(sql, mid)
+
+  console.log(rows);
+
+  res.json(rows)
+
+})
+
 router.get("/profile/api", async (req, res) => {
-  mid = req.query.mid
+  const mid = req.query.mid
  
   const sql = 'SELECT member_sid, nickname, avatar, intro FROM `members` WHERE member_sid = ?'
   const [rows] = await db.query(sql, mid)
