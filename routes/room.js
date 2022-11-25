@@ -38,7 +38,6 @@ router.get('/searchbar/getlocation',async (req,res)=>{
         locationRows:locationRows,
         mountainRows:mountainRows
         });
-})
 
 //SearchBar SELECT連動下方卡片
 router.get('/searchbar/getroom',async (req,res)=>{
@@ -63,5 +62,36 @@ router.get('/searchbar/namegetroom',async (req,res)=>{
         // ABC:'123'
         });
 })
+})
+
+//FilterPage
+//SearchBar SELECT連動FilterPage
+router.get('/searchbar/getmountain',async (req,res)=>{
+    const {location_sid}=req.query
+    const [locationRows] = await db.query(`SELECT * FROM location `)
+    const [mountainRows] = await db.query(`SELECT * FROM mountain WHERE location_sid=${location_sid}`)
+   
+    res.json({
+        locationRows:locationRows,
+       mRows:mountainRows
+        });
+})
+//SearchBar SELECT連動下方卡片
+router.get('/searchbar/FageGetRoom',async (req,res)=>{
+    const {mountain_sid}=req.query
+    const [roomRows] = await db.query(`SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=${mountain_sid}`) 
+   
+    res.json({
+        selRoomRows:roomRows,
+        });
+})
+
+//房間細節內頁
+router.get('/getRoomDetail/:room_sid', async (req, res)=>{
+    const {room_sid} = req.params 
+    const [rows] = await db.query(`SELECT * FROM room JOIN mountain ON room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room_sid=${room_sid}`);
+
+    res.json({rows:rows});
+});
 
 module.exports = router;
