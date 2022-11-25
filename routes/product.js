@@ -28,14 +28,15 @@ router.get("/borad/api", async (req, res) => {
             if(i+1 < rows.length  ){
                 mStr += `${v.follow_sid} OR member_sid = `
             }else{
-                mStr +=`${v.follow_sid}`
+                mStr +=`${v.follow_sid} ORDER BY total_height DESC`
             }
           })
     
           let reg =/\'|’|‘/g
           let a =mStr.replace(reg,"")
     
-          const sql2 = `SELECT * FROM members WHERE ${a}`
+          const  sql2 = `SELECT * FROM members WHERE ${a}`
+         
           const [rows0] = await db.query(sql2)
         //   console.log(mStr);
         //   console.log(rows0);
@@ -54,6 +55,23 @@ router.get("/borad/api", async (req, res) => {
   router.get("/borad/api2", async (req, res) => {
     const sql = 'SELECT * FROM members  ORDER BY total_height  DESC LIMIT 5'
     const [rows] = await db.query(sql)
+    res.json(rows)
+  })
+
+
+  router.get("/borad/api3", async (req, res) => {
+    let search = req.query.search
+    const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
+    const [rows] = await db.query(sql)
+    console.log(rows);
+    res.json(rows)
+  })
+
+  router.get("/borad/api4", async (req, res) => {
+    let search = req.query.search
+    const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
+    const [rows] = await db.query(sql)
+    console.log(rows);
     res.json(rows)
   })
 
@@ -117,7 +135,7 @@ router.post('/filter',upload.none(),async(req,res)=>{
       
     }else if(req.body.brand){
     [rows]= await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand}`)
-        res.json(rows);
+        
     }else if(req.body.proof){
     [rows] = await db.query('SELECT * FROM product')
 
@@ -130,25 +148,6 @@ router.post('/filter',upload.none(),async(req,res)=>{
 })
 
 
-// router.post('/brand',upload.none(),async(req,res)=>{
-//     // ${req.body.highPrice}
-//     // ${req.body.lowPrice} 
-//     const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand}`)
-//     res.json(rows);
-// })
 
-
-// router.post('/price',upload.none(),async(req,res)=>{
-//     // ${req.body.highPrice}
-//     // ${req.body.lowPrice} 
-//     const [rows] = await db.query(`SELECT *  FROM product WHERE product_price BETWEEN ${req.body.lowPrice}  AND ${req.body.highPrice}  `)
-//     res.json(rows);
-// })
-
-
-// router.post('/price&brand',upload.none(),async(req,res)=>{
-//     const [rows] = await db.query(`SELECT *  FROM product WHERE brand_sid=${req.body.brand} AND product_price>=${req.body.lowPrice} AND product_price<=${req.body.highPrice}`)
-//     res.json(rows); 
-// })
 
 module.exports = router;
