@@ -176,10 +176,51 @@ router.post("/reply/api", [auth, upload.none()], async (req, res) => {
 
 })
 
+router.post("/follow/api", auth, async (req, res)=>{
+  const output = {
+    success: false
+  } 
+
+  const mid = req.query.mid || 0
+  const fid = res.locals.loginUser.member_sid || 0
+
+  if(mid === fid) {
+    return output
+  }
+
+  const sql = "INSERT INTO `follows`(`member_sid`, `follow_sid`) VALUES (?, ?)"
+
+  const [result] = await db.query(sql, [mid, fid])
+
+  if(result.affectedRows) output.success = true
+
+  res.json(output)
+})
+
+router.get("/follow/api", async(req, res)=> {
+  const sql = "SELECT * FROM `follows` WHERE member_sid = ?"
+
+  const [rows] = await db.query(sql, req.query.mid)
+
+  // console.log(rows)
+
+  res.json(rows)
+})
+
+router.get("/following/api", async(req, res)=> {
+  const sql = "SELECT * FROM `follows` WHERE follow_sid = ?"
+
+  const [rows] = await db.query(sql, req.query.fid)
+
+  // console.log(rows)
+
+  res.json(rows)
+})
+
 router.get("/reply/api", async (req, res)=>{
   const pid = req.query.pid
 
-  const sql = "SELECT replies.context, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+  const sql = "SELECT replies.context, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
  
   const [rows] = await db.query(sql, pid)
 
@@ -196,7 +237,7 @@ router.get("/like/api", async (req, res)=> {
 
     const [rows] = await db.query(sql, [mid, pid])
 
-    console.log(rows);
+    // console.log(rows);
 
     res.json(rows)
 })
@@ -240,7 +281,7 @@ router.get("/modal/api", async (req, res) => {
   const sql = "SELECT members.nickname, members.total_height, members.avatar FROM members WHERE member_sid = ?"
   const [rows] = await db.query(sql, mid)
 
-  console.log(rows);
+  // console.log(rows);
 
   res.json(rows)
 
