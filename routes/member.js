@@ -266,6 +266,22 @@ router.delete("/like/api", async (req, res)=> {
 
 })
 
+router.delete("/follow/api", auth, async (req, res)=> {
+  const mid = req.query.mid
+  const fid = res.locals.loginUser.member_sid
+  const output = {
+    success: false,
+  }
+
+  const sql = "DELETE FROM `follows` WHERE member_sid = ? AND follow_sid = ?" 
+
+  const [result] = await db.query(sql, [mid, fid])
+
+  if (result.affectedRows) output.success = true
+
+  res.json(output)
+})
+
 router.get("/post/api", async (req, res) => {
   let mid = req.query.mid
 
