@@ -34,11 +34,12 @@ router.get("/borad/api", async (req, res) => {
     
           let reg =/\'|’|‘/g
           let a =mStr.replace(reg,"")
-    
-          const  sql2 = `SELECT * FROM members WHERE ${a}`
-         
+          
+          let  sql2 = `SELECT * FROM members WHERE ${a}`
+          console.log(req.query.search);
+          
+        
           const [rows0] = await db.query(sql2)
-        //   console.log(mStr);
         //   console.log(rows0);
           
         res.json(rows0)
@@ -63,17 +64,11 @@ router.get("/borad/api", async (req, res) => {
     let search = req.query.search
     const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
     const [rows] = await db.query(sql)
-    console.log(rows);
+    // console.log(rows);
     res.json(rows)
   })
 
-  router.get("/borad/api4", async (req, res) => {
-    let search = req.query.search
-    const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
-    const [rows] = await db.query(sql)
-    console.log(rows);
-    res.json(rows)
-  })
+ 
 
 
 
