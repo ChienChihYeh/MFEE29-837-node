@@ -37,32 +37,17 @@ CREATE TABLE `brand` (
 --
 
 INSERT INTO `brand` (`brand_sid`, `brand_name`) VALUES
-(1, 'Nike'),
-(2, 'Adidas'),
-(3, 'North Face'),
-(4, 'Decathlon'),
+(1, 'Fjällräven 小狐狸'),
+(2, 'Mont-bell'),
+(3, 'Mountain Hardwear'),
+(4, 'Rab'),
 (5, 'LOWA'),
 (6, 'Mammut'),
-(7, 'ARC\'TERYX'),
-(8, 'sea to summit'),
-(9, 'Rudy Project'),
-(10, 'Fjällräven'),
-(11, 'montbell'),
-(12, 'Black Diamond'),
-(13, 'Mystery Ranch '),
-(14, 'Osprey'),
-(15, 'KAVU'),
-(16, 'Nalgene'),
-(17, 'Camelbak '),
-(18, 'Hydrapak'),
-(19, 'EVERNEW'),
-(20, 'ZIPPO'),
-(21, 'ACME '),
-(22, 'PETZL'),
-(23, 'Trekmates '),
-(24, 'Outdoor Research '),
-(25, 'Salomon'),
-(26, 'Komperdell');
+(7, 'ARC\TERYX 始祖鳥'),
+(8, 'Mammut 長毛象'),
+(9, 'Grifone'),
+(10, 'Sprayway');
+
 
 --
 -- 已傾印資料表的索引
