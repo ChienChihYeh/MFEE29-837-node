@@ -75,37 +75,38 @@ router.get("/borad/api", async (req, res) => {
 
 
 router.get('/all',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product')
+    const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid Desc')
+    
     res.json(rows);
 })
 //最新商品
 router.get('/new',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product ORDER BY product_sid DESC')
+    const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid DESC')
     res.json(rows);
 })
 //熱門商品
 router.get('/hot',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product ORDER BY product_sid')
+    const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid')
     res.json(rows);
 })
 //服飾
 router.get('/clothe',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=2 or product_category_sid=9 or product_category_sid=10 or product_category_sid=11 or product_category_sid=12')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=2 or product_category_sid=9 or product_category_sid=10 or product_category_sid=11 or product_category_sid=12 GROUP BY product_name')
     res.json(rows);
 })
 //背包
 router.get('/bag',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=3')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=3 GROUP BY product_name')
     res.json(rows);
 })
 //鞋子
 router.get('/shose',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=4 or product_category_sid=7 or product_category_sid=8')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=4 or product_category_sid=7 or product_category_sid=8 GROUP BY product_name')
     res.json(rows);
 })
 //專業用品
 router.get('/accessories',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=5 or product_category_sid=6 or product_category_sid=15')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=5 or product_category_sid=6 or product_category_sid=15 GROUP BY product_name')
     res.json(rows);
 })
 //亂數生成
@@ -113,11 +114,15 @@ router.get('/random',async (req,res)=>{
     const [rows] = await db.query('SELECT * FROM product ORDER BY RAND() LIMIT 3')
     res.json(rows);
 })
-
-router.get('/:prodcut_sid',async (req,res)=>{
-    const [rows] = await db.query(`SELECT * FROM product WHERE product_sid=${req.params.prodcut_sid}`)
+//品牌
+router.get('/brands',async (req,res)=>{
+    const [rows] = await db.query(`SELECT distinct p.brand_sid,b.brand_name FROM product as p JOIN brand as b ON p.brand_sid = b.brand_sid`)
     res.json(rows);
 })
+
+
+
+
 
 
 router.post('/filter',upload.none(),async(req,res)=>{
@@ -143,6 +148,9 @@ router.post('/filter',upload.none(),async(req,res)=>{
 })
 
 
-
+router.get('/:prodcut_sid',async (req,res)=>{
+    const [rows] = await db.query(`SELECT * FROM product WHERE product_sid=${req.params.prodcut_sid}`)
+    res.json(rows);
+})
 
 module.exports = router;
