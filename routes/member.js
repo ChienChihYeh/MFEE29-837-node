@@ -184,8 +184,8 @@ router.post("/follow/api", auth, async (req, res)=>{
   const mid = req.query.mid || 0
   const fid = res.locals.loginUser.member_sid || 0
 
-  if(mid === fid) {
-    return output
+  if(`${mid}` === `${fid}`) {
+    return res.json(output)
   }
 
   const sql = "INSERT INTO `follows`(`member_sid`, `follow_sid`) VALUES (?, ?)"
@@ -198,7 +198,7 @@ router.post("/follow/api", auth, async (req, res)=>{
 })
 
 router.get("/follow/api", async(req, res)=> {
-  const sql = "SELECT * FROM `follows` WHERE member_sid = ?"
+  const sql = "SELECT members.nickname, members.avatar, members.member_sid FROM `follows` JOIN `members` ON follows.follow_sid = members.member_sid WHERE follows.member_sid = ?"
 
   const [rows] = await db.query(sql, req.query.mid)
 
@@ -306,7 +306,7 @@ router.get("/modal/api", async (req, res) => {
 router.get("/profile/api", async (req, res) => {
   const mid = req.query.mid
  
-  const sql = 'SELECT member_sid, nickname, avatar, intro FROM `members` WHERE member_sid = ?'
+  const sql = 'SELECT member_sid, nickname, avatar, intro, total_height FROM `members` WHERE member_sid = ?'
   const [rows] = await db.query(sql, mid)
   // console.log({rows});
   res.json({rows})
