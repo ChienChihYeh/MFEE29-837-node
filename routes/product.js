@@ -150,6 +150,14 @@ router.post('/filter',upload.none(),async(req,res)=>{
 
 router.get('/:prodcut_sid',async (req,res)=>{
     const [rows] = await db.query(`SELECT * FROM product WHERE product_sid=${req.params.prodcut_sid}`)
+
+
+   const a = rows.map((v, i) => {
+        return (
+            v.product_imgs = v.product_imgs.split(',')
+        )
+    })
+   
     res.json(rows);
 })
 
