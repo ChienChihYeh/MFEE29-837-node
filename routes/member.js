@@ -8,6 +8,8 @@ const { dirname } = require("path")
 const sharp = require('sharp');
 const { auth } = require(__dirname + "/../modules/auth.js")
 
+//TODO 註冊驗證 密碼變更驗證 全體/關注中貼文牆API
+
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
 //   [rows] = await db.query(sql, [req.query.id]);
@@ -468,7 +470,7 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
     sharp(req.file.path).resize({
       fit: sharp.fit.contain,
       width: 200
-  }).toFile(__dirname+ '/../public/uploads/thumb_' + req.file.filename)
+  }).toFile(__dirname+ '/../public/uploads/avatar_' + req.file.filename)
 
     if (req.body.prevAvatar) {
       fs.unlink(
