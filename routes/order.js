@@ -46,10 +46,11 @@ router.get("/api", async (req, res) => {
     camRows: camRows,
   });
 });
-
+let orders = {};
 router.post("/createOrder", async (req, res) => {
   const { orderID } = req.params;
   const order = req.body;
+  orders = order;
   try {
     //要送出去的東西
     const linePayBody = {
@@ -60,20 +61,9 @@ router.post("/createOrder", async (req, res) => {
         cancelUrl: `${LINEPAY_RETURN_HOST}/${LINEPAY_RETURN_CANCEL_URL}`,
       },
     };
-    const jsonStr = JSON.stringify(linePayBody);
+    // const jsonStr = JSON.stringify(linePayBody);
     const uri = "/payments/request";
-    const nonce = uuidv4();
-    const string = `${LINEPAY_CHANNEL_SECRET_KEY}/${LINEPAY_VERSION}${uri}${jsonStr}${nonce}`;
-    //製作簽章
-    const signature = Base64.stringify(
-      HmacSHA256(string, LINEPAY_CHANNEL_SECRET_KEY)
-    );
-    const headers = {
-      "Content-Type": "application/json",
-      "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
-      "X-LINE-Authorization-Nonce	": nonce,
-      "X-LINE-Authorization	": signature,
-    };
+    const headers = createSignature(uri, linePayBody);
 
     const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
     const linePayRes = await axios.post(url, linePayBody, { headers });
@@ -86,8 +76,44 @@ router.post("/createOrder", async (req, res) => {
   }
 });
 
+router.get("/pay/confirm", async (req, res) => {
+  const { transactionId } = req.query;
+  try {
+    const linePayBody = {
+      amount: orders.amount,
+      currency: orders.currency,
+    };
+    const uri = `/payments/${transactionId}/confirm`;
+    const headers = createSignature(uri, linePayBody);
+    const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
+    const linePayRes = await axios.post(url, linePayBody, { headers });
+    console.log(linePayRes);
+    res.json(linePayRes?.data);
+  } catch (error) {
+    console.log(error);
+    res.end();
+  }
+});
+//建立簽章的function
+function createSignature(uri, linePayBody) {
+  const nonce = uuidv4();
+  const string = `${LINEPAY_CHANNEL_SECRET_KEY}/${LINEPAY_VERSION}${uri}${JSON.stringify(
+    linePayBody
+  )}${nonce}`;
+  //製作簽章
+  const signature = Base64.stringify(
+    HmacSHA256(string, LINEPAY_CHANNEL_SECRET_KEY)
+  );
+  const headers = {
+    "Content-Type": "application/json",
+    "X-LINE-ChannelId": LINEPAY_CHANNEL_ID,
+    "X-LINE-Authorization-Nonce	": nonce,
+    "X-LINE-Authorization	": signature,
+  };
+  return headers;
+}
+
 router.get("/test", (req, res) => {
   res.json(uuidv4());
 });
-
 module.exports = router;
