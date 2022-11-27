@@ -208,7 +208,7 @@ router.get("/follow/api", async(req, res)=> {
 })
 
 router.get("/following/api", async(req, res)=> {
-  const sql = "SELECT * FROM `follows` WHERE follow_sid = ?"
+  const sql = "SELECT members.nickname, members.avatar, members.member_sid FROM `follows` JOIN `members` ON follows.member_sid = members.member_sid WHERE follows.follow_sid = ?"
 
   const [rows] = await db.query(sql, req.query.fid)
 
