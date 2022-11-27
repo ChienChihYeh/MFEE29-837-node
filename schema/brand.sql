@@ -46,7 +46,11 @@ INSERT INTO `brand` (`brand_sid`, `brand_name`) VALUES
 (7, 'ARC\TERYX 始祖鳥'),
 (8, 'Mammut 長毛象'),
 (9, 'Grifone'),
-(10, 'Sprayway');
+(10, 'Sprayway'),
+(11, 'Keen'),
+(12, 'Merrell'),
+(13, 'On'),
+(14, 'Zamberlan');
 
 
 --
