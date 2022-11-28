@@ -78,6 +78,7 @@ router.post("/createOrder", async (req, res) => {
 
 router.get("/pay/confirm", async (req, res) => {
   const { transactionId } = req.query;
+  console.log(transactionId);
   try {
     const linePayBody = {
       amount: orders.amount,
