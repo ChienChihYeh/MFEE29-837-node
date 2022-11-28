@@ -122,6 +122,12 @@ router.get('/brands',async (req,res)=>{
 
 
 
+// router.get('/size',async (req,res)=>{
+//     let name = req.query.name ;
+//     const [rows] = await db.query(`SELECT size FROM product WHERE product_name=${name}`)
+//     console.log(rows);
+//     res.json(rows);
+// })
 
 
 
@@ -158,6 +164,33 @@ router.get('/:prodcut_sid',async (req,res)=>{
         )
     })
    
+    res.json(rows);
+})
+
+//Size
+
+router.get('/size/:prodcut_sid',async (req,res)=>{
+    let Psid = +req.params.prodcut_sid
+    let str = `product_sid=${Psid} OR product_sid=${+Psid+1} OR product_sid=${+Psid+2} OR product_sid=${+Psid+3} OR product_sid=${+Psid+5} OR product_sid=${+Psid+6} OR product_sid=${+Psid+7}`
+    
+    // for (let i=0 ; i<=7 ; i++){
+    //     if(i=0){
+    //         str += `product_sid=${req.params.prodcut_sid} OR `
+    //     }
+    //     else if(i<7){
+            
+    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)} OR `
+    //     }else if(i=7){
+    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)}`
+    //     }
+    //     return
+    // }
+    // ${Sting((Number(req.params.prodcut_sid)+Number(1)))}
+    const [rows] = await db.query(`SELECT size FROM product WHERE ${str}`)
+
+    rows.map((v,i)=>{
+        return v.shoseChose = false
+    })
     res.json(rows);
 })
 
