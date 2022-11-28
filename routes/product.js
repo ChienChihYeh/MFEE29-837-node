@@ -91,7 +91,7 @@ router.get('/hot',async (req,res)=>{
 })
 //服飾
 router.get('/clothe',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=2 or product_category_sid=9 or product_category_sid=10 or product_category_sid=11 or product_category_sid=12 GROUP BY product_name')
+    const [rows] = await db.query('SELECT * FROM product WHERE  product_category_sid=2 or product_category_sid=9 or product_category_sid=10 or product_category_sid=11 or product_category_sid=12 GROUP BY product_name')
     res.json(rows);
 })
 //背包
@@ -101,12 +101,12 @@ router.get('/bag',async (req,res)=>{
 })
 //鞋子
 router.get('/shose',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=4 or product_category_sid=7 or product_category_sid=8 GROUP BY product_name')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=7 or product_category_sid=8 GROUP BY product_name')
     res.json(rows);
 })
 //專業用品
 router.get('/accessories',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=5 or product_category_sid=6 or product_category_sid=15 GROUP BY product_name')
+    const [rows] = await db.query('SELECT * FROM product WHERE product_category_sid=1 or product_category_sid=4 or product_category_sid=5 GROUP BY product_name')
     res.json(rows);
 })
 //亂數生成

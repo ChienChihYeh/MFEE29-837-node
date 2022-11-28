@@ -50,7 +50,14 @@ INSERT INTO `brand` (`brand_sid`, `brand_name`) VALUES
 (11, 'Keen'),
 (12, 'Merrell'),
 (13, 'On'),
-(14, 'Zamberlan');
+(14, 'Zamberlan'),
+(15, 'Mystery Ranch 神秘農場'),
+(16, 'Komperdell'),
+(17, 'LEDLENSER'),
+(18, 'Outdoor Research'),
+(19, '100mountain百岳'),
+(20, 'Pajak');
+
 
 
 --

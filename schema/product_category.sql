@@ -42,7 +42,7 @@ INSERT INTO `product_category` (`product_category_sid`, `product_category`, `gen
 (2, '帽子', NULL),
 (3, '背包', NULL),
 (4, '頭燈', NULL),
-(5, '水壺', NULL),
+(5, '睡袋', NULL),
 (6, '登山襪', NULL),
 (7, '鞋子', '男'),
 (8, '鞋子', '女'),
