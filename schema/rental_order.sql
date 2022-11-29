@@ -2,9 +2,9 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： 127.0.0.1
--- 產生時間： 2022-11-29 01:07:34
--- 伺服器版本： 10.5.17-MariaDB
+-- 主機： localhost
+-- 產生時間： 2022 年 11 月 29 日 09:14
+-- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -26,13 +26,13 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `rental_order`
 --
-
+DROP TABLE IF EXISTS `rental_order`;
 CREATE TABLE `rental_order` (
   `sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
   `rental_sid` int(11) NOT NULL,
-  `store_sid1` int(11) DEFAULT NULL COMMENT '(租)',
-  `store_sid2` int(11) DEFAULT NULL COMMENT '(還)',
+  `store_out` varchar(255) DEFAULT NULL COMMENT '(租)',
+  `store_back` varchar(255) DEFAULT NULL COMMENT '(還)',
   `out_date` date DEFAULT NULL,
   `back_date` datetime DEFAULT NULL,
   `deliveryFee` int(11) NOT NULL COMMENT '運費',
@@ -49,7 +49,7 @@ CREATE TABLE `rental_order` (
 -- 傾印資料表的資料 `rental_order`
 --
 
-INSERT INTO `rental_order` (`sid`, `order_num`, `rental_sid`, `store_sid1`, `store_sid2`, `out_date`, `back_date`, `deliveryFee`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
+INSERT INTO `rental_order` (`sid`, `order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`, `deliveryFee`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
 (6, '20220922030642', 30, NULL, NULL, NULL, NULL, 0, 1, 66, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
 (7, '20220922030642', 29, NULL, NULL, NULL, NULL, 0, 1, 60, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
 (8, '20220922030749', 30, NULL, NULL, NULL, NULL, 0, 1, 66, '', NULL, NULL, NULL, '2022-09-22 15:07:49'),

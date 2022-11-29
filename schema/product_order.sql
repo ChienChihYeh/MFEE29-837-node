@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `product_order`
 --
-
+DROP TABLE IF EXISTS `product_order`;
 CREATE TABLE `product_order` (
   `sid` int(11) NOT NULL,
   `order_num` varchar(255) CHARACTER SET utf8 COLLATE utf8_german2_ci NOT NULL,
