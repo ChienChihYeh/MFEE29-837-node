@@ -176,6 +176,21 @@ router.get("/pay/confirm", async (req, res) => {
     res.end();
   }
 });
+
+router.post("/writeEvaPro", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `product_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+
+router.get("/evaPro", async (req, res) => {
+  const sql =
+    "SELECT * FROM `product_order` join product on product_order.products_sid=product.product_sid WHERE product_order.sid=?";
+  const [rows] = await db.query(sql, [req.query.sid]);
+  res.json(rows);
+});
 //建立簽章的function
 function createSignature(uri, linePayBody) {
   const nonce = uuidv4();
