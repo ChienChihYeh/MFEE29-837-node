@@ -31,7 +31,7 @@ router.get("/api", async (req, res) => {
   [roomRows] = await db.query(childOrder2, [req.query.sid]);
   //租借
   const childOrder3 =
-    "SELECT * FROM `order`join `rental_order` on order.order_num = rental_order.order_num join rental on rental_order.rental_sid= rental.rental_product_sid where order.member_sid=?";
+    "SELECT * FROM `order`join `rental_order` on order.order_num = rental_order.order_num join rental on rental_order.rental_sid= rental.sid where order.member_sid=?";
   [renRows] = await db.query(childOrder3, [req.query.sid]);
 
   //活動
