@@ -8,6 +8,8 @@ const { dirname } = require("path")
 const sharp = require('sharp');
 const { auth } = require(__dirname + "/../modules/auth.js")
 
+//TODO 註冊驗證 密碼變更驗證 全體/關注中貼文牆API
+
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
 //   [rows] = await db.query(sql, [req.query.id]);
@@ -176,10 +178,51 @@ router.post("/reply/api", [auth, upload.none()], async (req, res) => {
 
 })
 
+router.post("/follow/api", auth, async (req, res)=>{
+  const output = {
+    success: false
+  } 
+
+  const mid = req.query.mid || 0
+  const fid = res.locals.loginUser.member_sid || 0
+
+  if(`${mid}` === `${fid}`) {
+    return res.json(output)
+  }
+
+  const sql = "INSERT INTO `follows`(`member_sid`, `follow_sid`) VALUES (?, ?)"
+
+  const [result] = await db.query(sql, [mid, fid])
+
+  if(result.affectedRows) output.success = true
+
+  res.json(output)
+})
+
+router.get("/follow/api", async(req, res)=> {
+  const sql = "SELECT members.nickname, members.avatar, members.member_sid FROM `follows` JOIN `members` ON follows.follow_sid = members.member_sid WHERE follows.member_sid = ?"
+
+  const [rows] = await db.query(sql, req.query.mid)
+
+  // console.log(rows)
+
+  res.json(rows)
+})
+
+router.get("/following/api", async(req, res)=> {
+  const sql = "SELECT members.nickname, members.avatar, members.member_sid FROM `follows` JOIN `members` ON follows.member_sid = members.member_sid WHERE follows.follow_sid = ?"
+
+  const [rows] = await db.query(sql, req.query.fid)
+
+  // console.log(rows)
+
+  res.json(rows)
+})
+
 router.get("/reply/api", async (req, res)=>{
   const pid = req.query.pid
 
-  const sql = "SELECT replies.context, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+  const sql = "SELECT replies.context, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
  
   const [rows] = await db.query(sql, pid)
 
@@ -196,7 +239,7 @@ router.get("/like/api", async (req, res)=> {
 
     const [rows] = await db.query(sql, [mid, pid])
 
-    console.log(rows);
+    // console.log(rows);
 
     res.json(rows)
 })
@@ -225,6 +268,22 @@ router.delete("/like/api", async (req, res)=> {
 
 })
 
+router.delete("/follow/api", auth, async (req, res)=> {
+  const mid = req.query.mid
+  const fid = res.locals.loginUser.member_sid
+  const output = {
+    success: false,
+  }
+
+  const sql = "DELETE FROM `follows` WHERE member_sid = ? AND follow_sid = ?" 
+
+  const [result] = await db.query(sql, [mid, fid])
+
+  if (result.affectedRows) output.success = true
+
+  res.json(output)
+})
+
 router.get("/post/api", async (req, res) => {
   let mid = req.query.mid
 
@@ -240,7 +299,7 @@ router.get("/modal/api", async (req, res) => {
   const sql = "SELECT members.nickname, members.total_height, members.avatar FROM members WHERE member_sid = ?"
   const [rows] = await db.query(sql, mid)
 
-  console.log(rows);
+  // console.log(rows);
 
   res.json(rows)
 
@@ -249,7 +308,7 @@ router.get("/modal/api", async (req, res) => {
 router.get("/profile/api", async (req, res) => {
   const mid = req.query.mid
  
-  const sql = 'SELECT member_sid, nickname, avatar, intro FROM `members` WHERE member_sid = ?'
+  const sql = 'SELECT member_sid, nickname, avatar, intro, total_height FROM `members` WHERE member_sid = ?'
   const [rows] = await db.query(sql, mid)
   // console.log({rows});
   res.json({rows})
@@ -270,6 +329,19 @@ router.get("/mountains/api", async (req, res)=> {
   // console.log(rows)
   res.json({rows})
 
+})
+
+router.get("/social/api", async (req, res)=> {
+  let sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid ORDER BY posts.post_sid DESC"
+
+  if(req.query.fid) {
+    sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `follows` ON follows.member_sid = posts.member_sid WHERE follows.follow_sid =" + req.query.fid + " ORDER BY posts.post_sid DESC"
+  } 
+
+  const [rows] = await db.query(sql)
+
+  res.json(rows)
+  // res.json(req.query.fid)
 })
 
 // router.use("/api", (req, res, next) => {
@@ -411,7 +483,7 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
     sharp(req.file.path).resize({
       fit: sharp.fit.contain,
       width: 200
-  }).toFile(__dirname+ '/../public/uploads/thumb_' + req.file.filename)
+  }).toFile(__dirname+ '/../public/uploads/avatar_' + req.file.filename)
 
     if (req.body.prevAvatar) {
       fs.unlink(
