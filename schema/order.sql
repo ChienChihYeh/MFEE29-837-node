@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-28 00:23:59
+-- 產生時間： 2022-11-29 01:07:45
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `order`
 --
-DROP TABLE IF EXISTS `order`;
+
 CREATE TABLE `order` (
   `sid` int(11) NOT NULL,
   `order_num` varchar(255) COLLATE utf8mb4_german2_ci NOT NULL,
@@ -64,7 +64,8 @@ INSERT INTO `order` (`sid`, `order_num`, `member_sid`, `total`, `recipient`, `re
 (61, '20220923035111', 633, '3165', '', '', '', '', '', '2022-09-23 15:51:11'),
 (62, '20220923044421', 647, '9058', '阿儒', '你家', '0987564321', 'LINE PAY', '感恩', '2022-09-23 16:44:21'),
 (63, '20220923044500', 647, '5859', 'Amy', '我家', '0965432198', '信用卡', '惜福', '2022-09-23 16:45:00'),
-(64, '20220923105945', 647, '3799', 'Amanda', '她家', '0912345678', 'ATM轉帳', '大愛', '2022-09-23 22:59:45');
+(64, '20220923105945', 647, '3799', 'Amanda', '她家', '0912345678', 'ATM轉帳', '大愛', '2022-09-23 22:59:45'),
+(81, '1669653873024', 647, '2400', 'Y', '新北市新莊區', '0987654321', '信用卡', '11111', '2022-11-29 00:44:51');
 
 --
 -- 已傾印資料表的索引
@@ -84,7 +85,7 @@ ALTER TABLE `order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order`
 --
 ALTER TABLE `order`
-  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

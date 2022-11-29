@@ -47,14 +47,14 @@ router.get("/api", async (req, res) => {
   });
 });
 let orders = {};
+let newOrder = {};
 router.post("/createOrder", async (req, res) => {
-  const { orderID } = req.params;
-  const order = req.body;
-  orders = order;
+  orders = req.body.order;
+  newOrder = req.body;
   try {
     //要送出去的東西
     const linePayBody = {
-      ...order,
+      ...orders,
       //成功的頁面跟取消的頁面
       redirectUrls: {
         confirmUrl: `${LINEPAY_RETURN_HOST}/${LINEPAY_RETURN_CONFIRM_URL}`,
@@ -67,8 +67,7 @@ router.post("/createOrder", async (req, res) => {
 
     const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
     const linePayRes = await axios.post(url, linePayBody, { headers });
-    console.log(linePayRes);
-
+    // console.log(linePayRes);
     res.json(linePayRes?.data);
   } catch (error) {
     console.log(error);
@@ -77,8 +76,10 @@ router.post("/createOrder", async (req, res) => {
 });
 
 router.get("/pay/confirm", async (req, res) => {
-  const { transactionId } = req.query;
-  console.log(transactionId);
+  const { transactionId, orderId } = req.query;
+  const { totalOrder } = newOrder;
+  const { pro, room, camp, ren } = totalOrder;
+  const { user } = newOrder.totalOrder;
   try {
     const linePayBody = {
       amount: orders.amount,
@@ -88,8 +89,60 @@ router.get("/pay/confirm", async (req, res) => {
     const headers = createSignature(uri, linePayBody);
     const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
     const linePayRes = await axios.post(url, linePayBody, { headers });
-    console.log(linePayRes);
-    res.json(linePayRes?.data);
+    // console.log(linePayRes);
+    if (linePayRes?.data?.returnCode === "0000") {
+      console.log(newOrder);
+      const sql =
+        "INSERT INTO `order`(`order_num`, `member_sid`, `total`, `recipient`, `recipient_address`, `recipient_phone`, `payment`, `remark`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+      const [rows] = await db.query(sql, [
+        orderId,
+        totalOrder.memberSid,
+        totalOrder.totalPrice,
+        user.name,
+        user.address,
+        user.mobile,
+        totalOrder.pay,
+        user.text,
+      ]);
+      if (pro) {
+        for (let i = 0; i < pro.length; i++) {
+          const proOrder =
+            "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+          const [proRows] = await db.query(proOrder, [
+            orderId,
+            pro[i].sid,
+            pro[i].size,
+            pro[i].quantity,
+            pro[i].quantity * pro[i].price,
+            pro[i].img,
+          ]);
+        }
+      }
+      if (room) {
+        for (let i = 0; i < room.length; i++) {
+          const roomOrder =
+            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
+          const [roomRows] = await db.query(roomOrder, [
+            orderId,
+            room[i].sid,
+            room[i].startDate,
+            room[i].endDate,
+            room[i].quantity,
+            room[i].quantity * room[i].price,
+            room[i].img,
+          ]);
+        }
+      }
+      if (ren) {
+      }
+      if (camp) {
+      }
+
+      if (rows.affectedRows) {
+        res.json(linePayRes?.data);
+      }
+    }
+    // res.json(linePayRes?.data);
   } catch (error) {
     console.log(error);
     res.end();
@@ -114,7 +167,10 @@ function createSignature(uri, linePayBody) {
   return headers;
 }
 
-router.get("/test", (req, res) => {
-  res.json(uuidv4());
-});
+// router.get("/test", (req, res) => {
+//   res.json(uuidv4());
+// });
+// router.post("/test2", (req, res) => {
+//   console.log(req.body);
+// });
 module.exports = router;
