@@ -55,7 +55,10 @@ router.get('/searchbar/namegetroom',async (req,res)=>{
     const {mountain}=req.query
     // console.log(req.params.selectRoom)
     // console.log(req.params.roomname)
-    const [roomRows] = await db.query(`SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=${mountain} AND room.room_name LIKE '%${roomname}%'`)
+    const [roomRows] = await db.query(
+        `SELECT * FROM room 
+        JOIN mountain on room.mountain_sid=mountain.mountain_sid 
+        JOIN location ON room.location_sid=location.sid WHERE room.mountain_sid=${mountain} AND room.room_name LIKE '%${roomname}%'`)
    
     res.json({
         roomRows:roomRows,
