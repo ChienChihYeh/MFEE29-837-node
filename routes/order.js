@@ -5,6 +5,7 @@ const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2.js");
 const upload = require(__dirname + "/../modules/upload-img.js");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const {
@@ -15,7 +16,15 @@ const {
   LINEPAY_RETURN_HOST,
   LINEPAY_RETURN_CONFIRM_URL,
   LINEPAY_RETURN_CANCEL_URL,
+  MAIL_USERNAME,
+  MAIL_PASSWORD,
 } = process.env;
+const moneyFormat = (price) => {
+  let a = Number(price);
+  let b = a.toLocaleString("zh-TW", { style: "currency", currency: "TWD" });
+  let c = b.split(".");
+  return c[0];
+};
 router.get("/api", async (req, res) => {
   //母訂單
   const momOrder =
@@ -33,6 +42,7 @@ router.get("/api", async (req, res) => {
   const childOrder3 =
     "SELECT * FROM `order`join `rental_order` on order.order_num = rental_order.order_num join rental on rental_order.rental_sid= rental.sid where order.member_sid=?";
   [renRows] = await db.query(childOrder3, [req.query.sid]);
+  renRows.map((v) => (v.rental_img = v.rental_img.split(",")));
 
   //活動
   const childOrder4 =
@@ -111,7 +121,7 @@ router.get("/pay/confirm", async (req, res) => {
           const [proRows] = await db.query(proOrder, [
             orderId,
             pro[i].sid,
-            pro[i].size,
+            pro[i].size || "",
             pro[i].quantity,
             pro[i].quantity * pro[i].price,
             pro[i].img,
@@ -121,7 +131,7 @@ router.get("/pay/confirm", async (req, res) => {
       if (room) {
         for (let i = 0; i < room.length; i++) {
           const roomOrder =
-            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, day,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `day`,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
           const [roomRows] = await db.query(roomOrder, [
             orderId,
             room[i].sid,
@@ -137,7 +147,7 @@ router.get("/pay/confirm", async (req, res) => {
       if (ren) {
         for (let i = 0; i < ren.length; i++) {
           const renOrder =
-            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,day, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,`day`, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
           const renRows = await db.query(renOrder, [
             orderId,
             ren[i].sid,
@@ -170,6 +180,27 @@ router.get("/pay/confirm", async (req, res) => {
       }
 
       if (rows.affectedRows) {
+        const transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 465,
+          auth: {
+            user: MAIL_USERNAME,
+            pass: MAIL_PASSWORD,
+          },
+        });
+        transporter
+          .sendMail({
+            from: "gohiking837@gmail.com",
+            to: "buyuser1214@gmail.com",
+            subject: "訂單成立通知信",
+            html: `<h1>訂單已成立</h1><p>訂單編號：${orderId}</p> <p style='color:red'>總金額:${moneyFormat(
+              totalOrder.totalPrice
+            )}</p>`,
+          })
+          .then((res) => {
+            console.log({ res });
+          })
+          .catch(console.error);
         res.json(linePayRes?.data);
       }
     }
@@ -208,7 +239,28 @@ router.post("/writeEvaCamp", async (req, res) => {
   const [rows] = await db.query(sql, [star, text, sid]);
   res.json(rows);
 });
+// router.get("/mail", (req, res) => {
+//   const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 465,
+//     auth: {
+//       user: "gohiking837@gmail.com",
+//       pass: "aumabmmefhbnvljl",
+//     },
+//   });
 
+//   transporter
+//     .sendMail({
+//       from: "gohiking@gmail",
+//       to: "game665987@gmail.com",
+//       subject: "訂單成立通知信",
+//       html: "<h1>訂單已成立</h1><p>訂單編號：0000000</p>",
+//     })
+//     .then((res) => {
+//       console.log({ res });
+//     })
+//     .catch(console.error);
+// });
 router.get("/lookEva", async (req, res) => {
   if (req.query.proSid !== undefined) {
     const sql =
@@ -226,6 +278,7 @@ router.get("/lookEva", async (req, res) => {
     const sql =
       "SELECT * FROM `rental_order` join rental on rental_order.rental_sid=rental.sid WHERE rental_order.order_sid=?";
     const [rows] = await db.query(sql, [req.query.renSid]);
+    rows.map((v) => (v.rental_img = v.rental_img.split(",")));
     res.json(rows);
   }
   if (req.query.campSid !== undefined) {
