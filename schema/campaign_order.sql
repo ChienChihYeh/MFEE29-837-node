@@ -2,9 +2,9 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： 127.0.0.1
--- 產生時間： 2022-11-30 00:57:21
--- 伺服器版本： 10.5.17-MariaDB
+-- 主機： localhost
+-- 產生時間： 2022 年 11 月 30 日 17:02
+-- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -26,14 +26,13 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `campaign_order`
 --
-DROP TABLE IF EXISTS `campaign_order`;
+
 CREATE TABLE `campaign_order` (
   `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
   `campaign_sid` int(11) NOT NULL,
-  `campaign_type_sid` int(11) DEFAULT NULL,
+  `dayname` varchar(255) DEFAULT NULL,
   `date_start` date DEFAULT NULL,
-  `date_end` datetime DEFAULT NULL,
   `people` int(255) NOT NULL,
   `total` int(255) NOT NULL,
   `img` varchar(255) NOT NULL,
@@ -47,24 +46,24 @@ CREATE TABLE `campaign_order` (
 -- 傾印資料表的資料 `campaign_order`
 --
 
-INSERT INTO `campaign_order` (`order_sid`, `order_num`, `campaign_sid`, `campaign_type_sid`, `date_start`, `date_end`, `people`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
-(2, '20220922030642', 5, NULL, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
-(3, '20220922030749', 5, NULL, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:49'),
-(4, '20220922030751', 5, NULL, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:51'),
-(5, '20220922030753', 5, NULL, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:53'),
-(6, '20220922030900', 5, NULL, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:09:00'),
-(7, '20220922031127', 7, NULL, NULL, NULL, 0, 33, '', NULL, NULL, NULL, '2022-09-22 15:11:27'),
-(8, '20220923024833', 51, NULL, NULL, NULL, 0, 3600, '', NULL, NULL, NULL, '2022-09-23 14:48:33'),
-(9, '20220923025551', 50, NULL, NULL, NULL, 0, 2200, '', NULL, NULL, NULL, '2022-09-23 14:55:51'),
-(10, '20220923025620', 50, NULL, NULL, NULL, 0, 4400, '', 5, '555', '2022-11-29', '2022-11-29 23:31:01'),
-(12, '20220923030059', 43, NULL, NULL, NULL, 0, 24800, '', NULL, NULL, NULL, '2022-09-23 15:00:59'),
-(13, '20220923035111', 49, NULL, NULL, NULL, 0, 1500, '', NULL, NULL, NULL, '2022-09-23 15:51:11'),
-(14, '20220923044421', 50, NULL, NULL, NULL, 0, 2200, '', NULL, NULL, NULL, '2022-09-23 16:44:21'),
-(15, '20220923044421', 48, NULL, NULL, NULL, 0, 2500, '', NULL, NULL, NULL, '2022-09-23 16:44:21'),
-(16, '20220923044500', 48, NULL, NULL, NULL, 0, 2500, '', 4, '44444', '2022-11-30', '2022-11-30 00:30:17'),
-(17, '20220923105945', 50, NULL, NULL, NULL, 0, 2200, '', 4, '2222', '2022-11-30', '2022-11-30 00:27:31'),
-(23, '1669685741910', 10, NULL, '2022-11-29', NULL, 1, 1900, 'img', 4, '222', '2022-11-30', '2022-11-30 00:24:03'),
-(24, '1669690525756', 10, NULL, '2022-11-29', NULL, 7, 13300, 'img', 5, '77', '2022-11-30', '2022-11-30 00:14:36');
+INSERT INTO `campaign_order` (`order_sid`, `order_num`, `campaign_sid`, `dayname`, `date_start`, `people`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
+(2, '20220922030642', 5, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
+(3, '20220922030749', 5, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:49'),
+(4, '20220922030751', 5, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:51'),
+(5, '20220922030753', 5, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:07:53'),
+(6, '20220922030900', 5, NULL, NULL, 0, 1, '', NULL, NULL, NULL, '2022-09-22 15:09:00'),
+(7, '20220922031127', 7, NULL, NULL, 0, 33, '', NULL, NULL, NULL, '2022-09-22 15:11:27'),
+(8, '20220923024833', 51, NULL, NULL, 0, 3600, '', NULL, NULL, NULL, '2022-09-23 14:48:33'),
+(9, '20220923025551', 50, NULL, NULL, 0, 2200, '', NULL, NULL, NULL, '2022-09-23 14:55:51'),
+(10, '20220923025620', 50, NULL, NULL, 0, 4400, '', 5, '555', '2022-11-29', '2022-11-29 23:31:01'),
+(12, '20220923030059', 43, NULL, NULL, 0, 24800, '', NULL, NULL, NULL, '2022-09-23 15:00:59'),
+(13, '20220923035111', 49, NULL, NULL, 0, 1500, '', NULL, NULL, NULL, '2022-09-23 15:51:11'),
+(14, '20220923044421', 50, NULL, NULL, 0, 2200, '', 3, '1234', '2022-11-30', '2022-11-30 12:06:12'),
+(15, '20220923044421', 48, NULL, NULL, 0, 2500, '', 1, '1234', '2022-11-30', '2022-11-30 12:09:18'),
+(16, '20220923044500', 48, NULL, NULL, 0, 2500, '', 4, '44444', '2022-11-30', '2022-11-30 00:30:17'),
+(17, '20220923105945', 50, NULL, NULL, 0, 2200, '', 4, '2222', '2022-11-30', '2022-11-30 00:27:31'),
+(23, '1669685741910', 10, NULL, '2022-11-29', 1, 1900, 'img', 4, '222', '2022-11-30', '2022-11-30 00:24:03'),
+(24, '1669690525756', 10, NULL, '2022-11-29', 7, 13300, 'img', 5, '77', '2022-11-30', '2022-11-30 00:14:36');
 
 --
 -- 已傾印資料表的索引

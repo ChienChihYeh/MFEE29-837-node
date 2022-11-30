@@ -121,14 +121,15 @@ router.get("/pay/confirm", async (req, res) => {
       if (room) {
         for (let i = 0; i < room.length; i++) {
           const roomOrder =
-            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, day,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
           const [roomRows] = await db.query(roomOrder, [
             orderId,
             room[i].sid,
             room[i].startDate,
             room[i].endDate,
+            room[i].day,
             room[i].quantity,
-            room[i].quantity * room[i].price,
+            room[i].quantity * room[i].price * room[i].day,
             room[i].img,
           ]);
         }
@@ -136,7 +137,7 @@ router.get("/pay/confirm", async (req, res) => {
       if (ren) {
         for (let i = 0; i < ren.length; i++) {
           const renOrder =
-            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,day, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
           const renRows = db.query(renOrder, [
             orderId,
             ren[i].sid,
@@ -144,9 +145,10 @@ router.get("/pay/confirm", async (req, res) => {
             ren[i].back,
             ren[i].start,
             ren[i].end,
+            ren[i].day,
             ren[i].deliveryFee,
             ren[i].quantity,
-            ren[i].quantity * ren[i].price + ren[i].deliveryFee,
+            ren[i].quantity * ren[i].price * ren[i].day + ren[i].deliveryFee,
             ren[i].img,
           ]);
         }
@@ -154,10 +156,11 @@ router.get("/pay/confirm", async (req, res) => {
       if (camp) {
         for (let i = 0; i < camp.length; i++) {
           const campOrder =
-            "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+            "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`,dayname, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
           const campRows = db.query(campOrder, [
             orderId,
             camp[i].sid,
+            camp[i].dayname,
             camp[i].startDate,
             camp[i].quantity,
             camp[i].quantity * camp[i].price,
