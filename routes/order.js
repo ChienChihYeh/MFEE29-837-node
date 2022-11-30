@@ -244,8 +244,8 @@ router.post("/writeEvaCamp", async (req, res) => {
 //     host: "smtp.gmail.com",
 //     port: 465,
 //     auth: {
-//       user: "gohiking837@gmail.com",
-//       pass: "aumabmmefhbnvljl",
+//       user: "",
+//       pass: "",
 //     },
 //   });
 
