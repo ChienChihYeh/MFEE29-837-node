@@ -138,7 +138,7 @@ router.get("/pay/confirm", async (req, res) => {
         for (let i = 0; i < ren.length; i++) {
           const renOrder =
             "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,day, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
-          const renRows = db.query(renOrder, [
+          const renRows = await db.query(renOrder, [
             orderId,
             ren[i].sid,
             ren[i].out,
@@ -157,7 +157,7 @@ router.get("/pay/confirm", async (req, res) => {
         for (let i = 0; i < camp.length; i++) {
           const campOrder =
             "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`,dayname, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
-          const campRows = db.query(campOrder, [
+          const campRows = await db.query(campOrder, [
             orderId,
             camp[i].sid,
             camp[i].dayname,
