@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `rental_order`
 --
-
+DROP TABLE IF EXISTS `rental_order`;
 CREATE TABLE `rental_order` (
   `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
