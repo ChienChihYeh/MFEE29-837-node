@@ -19,7 +19,7 @@ const {
 router.get("/api", async (req, res) => {
   //母訂單
   const momOrder =
-    "SELECT * FROM `order` WHERE `member_sid`=? ORDER BY sid DESC ";
+    "SELECT * FROM `order` WHERE `member_sid`=? ORDER BY order_sid DESC ";
   [rows] = await db.query(momOrder, [req.query.sid]);
   //商品
   const childOrder =
@@ -121,14 +121,15 @@ router.get("/pay/confirm", async (req, res) => {
       if (room) {
         for (let i = 0; i < room.length; i++) {
           const roomOrder =
-            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, day,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
           const [roomRows] = await db.query(roomOrder, [
             orderId,
             room[i].sid,
             room[i].startDate,
             room[i].endDate,
+            room[i].day,
             room[i].quantity,
-            room[i].quantity * room[i].price,
+            room[i].quantity * room[i].price * room[i].day,
             room[i].img,
           ]);
         }
@@ -136,7 +137,7 @@ router.get("/pay/confirm", async (req, res) => {
       if (ren) {
         for (let i = 0; i < ren.length; i++) {
           const renOrder =
-            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
+            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,day, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
           const renRows = db.query(renOrder, [
             orderId,
             ren[i].sid,
@@ -144,9 +145,10 @@ router.get("/pay/confirm", async (req, res) => {
             ren[i].back,
             ren[i].start,
             ren[i].end,
+            ren[i].day,
             ren[i].deliveryFee,
             ren[i].quantity,
-            ren[i].quantity * ren[i].price + ren[i].deliveryFee,
+            ren[i].quantity * ren[i].price * ren[i].day + ren[i].deliveryFee,
             ren[i].img,
           ]);
         }
@@ -154,10 +156,11 @@ router.get("/pay/confirm", async (req, res) => {
       if (camp) {
         for (let i = 0; i < camp.length; i++) {
           const campOrder =
-            "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+            "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`,dayname, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
           const campRows = db.query(campOrder, [
             orderId,
             camp[i].sid,
+            camp[i].dayname,
             camp[i].startDate,
             camp[i].quantity,
             camp[i].quantity * camp[i].price,
@@ -174,6 +177,62 @@ router.get("/pay/confirm", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.end();
+  }
+});
+
+router.post("/writeEvaPro", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `product_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaRoom", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `booking_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaRen", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `rental_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaCamp", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `campaign_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+
+router.get("/lookEva", async (req, res) => {
+  if (req.query.proSid !== undefined) {
+    const sql =
+      "SELECT * FROM `product_order` join product on product_order.products_sid=product.product_sid WHERE product_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.proSid]);
+    res.json(rows);
+  }
+  if (req.query.roomSid !== undefined) {
+    const sql =
+      "SELECT * FROM `booking_order` join room on booking_order.room_sid=room.room_sid WHERE booking_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.roomSid]);
+    res.json(rows);
+  }
+  if (req.query.renSid !== undefined) {
+    const sql =
+      "SELECT * FROM `rental_order` join rental on rental_order.rental_sid=rental.sid WHERE rental_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.renSid]);
+    res.json(rows);
+  }
+  if (req.query.campSid !== undefined) {
+    const sql =
+      "SELECT * FROM `campaign_order` join campaign on campaign_order.campaign_sid=campaign.sid WHERE campaign_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.campSid]);
+    res.json(rows);
   }
 });
 //建立簽章的function

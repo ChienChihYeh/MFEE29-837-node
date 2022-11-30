@@ -2,9 +2,9 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： 127.0.0.1
--- 產生時間： 2022-11-29 01:07:45
--- 伺服器版本： 10.5.17-MariaDB
+-- 主機： localhost
+-- 產生時間： 2022 年 11 月 30 日 17:01
+-- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
-  `sid` int(11) NOT NULL,
+  `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) COLLATE utf8mb4_german2_ci NOT NULL,
   `member_sid` int(11) NOT NULL,
   `total` varchar(255) COLLATE utf8mb4_german2_ci NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `order` (
 -- 傾印資料表的資料 `order`
 --
 
-INSERT INTO `order` (`sid`, `order_num`, `member_sid`, `total`, `recipient`, `recipient_address`, `recipient_phone`, `payment`, `remark`, `created_time`) VALUES
+INSERT INTO `order` (`order_sid`, `order_num`, `member_sid`, `total`, `recipient`, `recipient_address`, `recipient_phone`, `payment`, `remark`, `created_time`) VALUES
 (40, '20220922030642', 2, '3466', '', '', '', '', '', '2022-09-22 15:06:42'),
 (41, '20220922030749', 2, '3466', '', '', '', '', '', '2022-09-22 15:07:49'),
 (42, '20220922030751', 2, '3466', '', '', '', '', '', '2022-09-22 15:07:51'),
@@ -65,7 +65,12 @@ INSERT INTO `order` (`sid`, `order_num`, `member_sid`, `total`, `recipient`, `re
 (62, '20220923044421', 647, '9058', '阿儒', '你家', '0987564321', 'LINE PAY', '感恩', '2022-09-23 16:44:21'),
 (63, '20220923044500', 647, '5859', 'Amy', '我家', '0965432198', '信用卡', '惜福', '2022-09-23 16:45:00'),
 (64, '20220923105945', 647, '3799', 'Amanda', '她家', '0912345678', 'ATM轉帳', '大愛', '2022-09-23 22:59:45'),
-(81, '1669653873024', 647, '2400', 'Y', '新北市新莊區', '0987654321', '信用卡', '11111', '2022-11-29 00:44:51');
+(83, '1669685741910', 647, '7900', 'YIRU測試2222', '新北市新莊區', '0987654321', 'LINE PAY', '', '2022-11-29 09:36:03'),
+(84, '1669690525756', 647, '40300', 'YIRU測試111', '新北市大安區', '0987654321', 'LINE PAY', 'test', '2022-11-29 10:55:56'),
+(85, '1669792688917', 647, '123750', 'YIRU測試111', '新北市大安區', '0987654321', 'LINE PAY', '', '2022-11-30 15:18:24'),
+(86, '1669793490410', 647, '900', '', '', '0', '', '', '2022-11-30 15:31:43'),
+(89, '1669795347257', 647, '24000', '', '', '0', '', '', '2022-11-30 16:02:43'),
+(90, '1669795581953', 647, '24000', '', '', '0', '', '', '2022-11-30 16:06:46');
 
 --
 -- 已傾印資料表的索引
@@ -75,7 +80,7 @@ INSERT INTO `order` (`sid`, `order_num`, `member_sid`, `total`, `recipient`, `re
 -- 資料表索引 `order`
 --
 ALTER TABLE `order`
-  ADD PRIMARY KEY (`sid`);
+  ADD PRIMARY KEY (`order_sid`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -85,7 +90,7 @@ ALTER TABLE `order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `order`
 --
 ALTER TABLE `order`
-  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
