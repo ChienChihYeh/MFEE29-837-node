@@ -123,7 +123,7 @@ router.get("/borad/api", async (req, res) => {
 
 
 router.get('/all',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid Desc')
+    const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY  RAND()')
     
     res.json(rows);
 })
