@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `campaign_order`
 --
-
+DROP TABLE IF EXISTS `campaign_order`;
 CREATE TABLE `campaign_order` (
   `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
