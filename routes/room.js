@@ -7,7 +7,7 @@ const upload = require(__dirname + '/../modules/upload-img')
 router.get('/list',async (req,res)=>{
     const [rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid')
     const [M1rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=3 LIMIT 4')
-    const [M2rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=2 LIMIT 4')
+    const [M2rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=40 LIMIT 4')
     const [M3rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=5 LIMIT 4')
     res.json({
         rows:rows,
@@ -92,7 +92,15 @@ router.get('/searchbar/FageGetRoom',async (req,res)=>{
 //房間細節內頁
 router.get('/getRoomDetail/:room_sid', async (req, res)=>{
     const {room_sid} = req.params 
-    const [rows] = await db.query(`SELECT * FROM room JOIN mountain ON room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room_sid=${room_sid}`);
+    const [rows] = await db.query(`SELECT * FROM room 
+    JOIN mountain ON room.mountain_sid=mountain.mountain_sid 
+    JOIN location ON location.sid=room.location_sid 
+    WHERE room_sid=${room_sid}`);
+
+    rows[0].room_imgs =rows[0].room_imgs.split(',')
+    rows[0].room_service_sid =rows[0].room_service_sid.split(',')
+
+
 
     res.json({rows:rows});
 });
