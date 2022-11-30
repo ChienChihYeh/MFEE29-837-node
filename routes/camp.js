@@ -11,8 +11,16 @@ router.get('/title',async (req,res)=>{
 })
 
 router.get('/all',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM `campaign` JOIN `campaign_type` ON `campaign`.`campaign_type_sid` =`campaign_type`.`sid`')
+    const [rows] = await db.query('SELECT * FROM `campaign` JOIN `campaign_type` ON `campaign`.`campaign_type_sid` =`campaign_type`.`sid` JOIN `campaign_days` ON `campaign`.`campaign_days_sid` = `campaign_days`.`sid`')
       res.json(rows);
 })
+
+//camp_sid
+router.get('/sid',async (req,res)=>{
+    const [rows] = await db.query('SELECT * FROM campaign')
+      res.json(rows);
+})
+
+
 
 module.exports = router;

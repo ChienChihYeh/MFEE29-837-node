@@ -5,6 +5,7 @@ const express = require("express");
 const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2.js");
 const upload = require(__dirname + "/../modules/upload-img.js");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const {
@@ -15,11 +16,19 @@ const {
   LINEPAY_RETURN_HOST,
   LINEPAY_RETURN_CONFIRM_URL,
   LINEPAY_RETURN_CANCEL_URL,
+  MAIL_USERNAME,
+  MAIL_PASSWORD,
 } = process.env;
+const moneyFormat = (price) => {
+  let a = Number(price);
+  let b = a.toLocaleString("zh-TW", { style: "currency", currency: "TWD" });
+  let c = b.split(".");
+  return c[0];
+};
 router.get("/api", async (req, res) => {
   //母訂單
   const momOrder =
-    "SELECT * FROM `order` WHERE `member_sid`=? ORDER BY sid DESC ";
+    "SELECT * FROM `order` WHERE `member_sid`=? ORDER BY order_sid DESC ";
   [rows] = await db.query(momOrder, [req.query.sid]);
   //商品
   const childOrder =
@@ -31,8 +40,9 @@ router.get("/api", async (req, res) => {
   [roomRows] = await db.query(childOrder2, [req.query.sid]);
   //租借
   const childOrder3 =
-    "SELECT * FROM `order`join `rental_order` on order.order_num = rental_order.order_num join rental on rental_order.rental_sid= rental.rental_product_sid where order.member_sid=?";
+    "SELECT * FROM `order`join `rental_order` on order.order_num = rental_order.order_num join rental on rental_order.rental_sid= rental.sid where order.member_sid=?";
   [renRows] = await db.query(childOrder3, [req.query.sid]);
+  renRows.map((v) => (v.rental_img = v.rental_img.split(",")));
 
   //活動
   const childOrder4 =
@@ -47,14 +57,14 @@ router.get("/api", async (req, res) => {
   });
 });
 let orders = {};
+let newOrder = {};
 router.post("/createOrder", async (req, res) => {
-  const { orderID } = req.params;
-  const order = req.body;
-  orders = order;
+  orders = req.body.order;
+  newOrder = req.body;
   try {
     //要送出去的東西
     const linePayBody = {
-      ...order,
+      ...orders,
       //成功的頁面跟取消的頁面
       redirectUrls: {
         confirmUrl: `${LINEPAY_RETURN_HOST}/${LINEPAY_RETURN_CONFIRM_URL}`,
@@ -67,8 +77,7 @@ router.post("/createOrder", async (req, res) => {
 
     const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
     const linePayRes = await axios.post(url, linePayBody, { headers });
-    console.log(linePayRes);
-
+    // console.log(linePayRes);
     res.json(linePayRes?.data);
   } catch (error) {
     console.log(error);
@@ -77,8 +86,10 @@ router.post("/createOrder", async (req, res) => {
 });
 
 router.get("/pay/confirm", async (req, res) => {
-  const { transactionId } = req.query;
-  console.log(transactionId);
+  const { transactionId, orderId } = req.query;
+  const { totalOrder } = newOrder;
+  const { pro, room, camp, ren } = totalOrder;
+  const { user } = newOrder.totalOrder;
   try {
     const linePayBody = {
       amount: orders.amount,
@@ -88,11 +99,193 @@ router.get("/pay/confirm", async (req, res) => {
     const headers = createSignature(uri, linePayBody);
     const url = `${LINEPAY_SITE}/${LINEPAY_VERSION}${uri}`;
     const linePayRes = await axios.post(url, linePayBody, { headers });
-    console.log(linePayRes);
-    res.json(linePayRes?.data);
+    // console.log(linePayRes);
+    if (linePayRes?.data?.returnCode === "0000") {
+      console.log(newOrder);
+      const sql =
+        "INSERT INTO `order`(`order_num`, `member_sid`, `total`, `recipient`, `recipient_address`, `recipient_phone`, `payment`, `remark`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+      const [rows] = await db.query(sql, [
+        orderId,
+        totalOrder.memberSid,
+        totalOrder.totalPrice,
+        user.name,
+        user.address,
+        user.mobile,
+        totalOrder.pay,
+        user.text,
+      ]);
+      if (pro) {
+        for (let i = 0; i < pro.length; i++) {
+          const proOrder =
+            "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+          const [proRows] = await db.query(proOrder, [
+            orderId,
+            pro[i].sid,
+            pro[i].size || "",
+            pro[i].quantity,
+            pro[i].quantity * pro[i].price,
+            pro[i].img,
+          ]);
+        }
+      }
+      if (room) {
+        for (let i = 0; i < room.length; i++) {
+          const roomOrder =
+            "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `day`,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+          const [roomRows] = await db.query(roomOrder, [
+            orderId,
+            room[i].sid,
+            room[i].startDate,
+            room[i].endDate,
+            room[i].day,
+            room[i].quantity,
+            room[i].quantity * room[i].price * room[i].day,
+            room[i].img,
+          ]);
+        }
+      }
+      if (ren) {
+        for (let i = 0; i < ren.length; i++) {
+          const renOrder =
+            "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,`day`, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
+          const renRows = await db.query(renOrder, [
+            orderId,
+            ren[i].sid,
+            ren[i].out,
+            ren[i].back,
+            ren[i].start,
+            ren[i].end,
+            ren[i].day,
+            ren[i].deliveryFee,
+            ren[i].quantity,
+            ren[i].quantity * ren[i].price * ren[i].day + ren[i].deliveryFee,
+            ren[i].img,
+          ]);
+        }
+      }
+      if (camp) {
+        for (let i = 0; i < camp.length; i++) {
+          const campOrder =
+            "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`,dayname, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
+          const campRows = await db.query(campOrder, [
+            orderId,
+            camp[i].sid,
+            camp[i].dayname,
+            camp[i].startDate,
+            camp[i].quantity,
+            camp[i].quantity * camp[i].price,
+            camp[i].img,
+          ]);
+        }
+      }
+
+      if (rows.affectedRows) {
+        const transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 465,
+          auth: {
+            user: MAIL_USERNAME,
+            pass: MAIL_PASSWORD,
+          },
+        });
+        transporter
+          .sendMail({
+            from: "gohiking837@gmail.com",
+            to: "buyuser1214@gmail.com",
+            subject: "訂單成立通知信",
+            html: `<h1>訂單已成立</h1><p>訂單編號：${orderId}</p> <p style='color:red'>總金額:${moneyFormat(
+              totalOrder.totalPrice
+            )}</p>`,
+          })
+          .then((res) => {
+            console.log({ res });
+          })
+          .catch(console.error);
+        res.json(linePayRes?.data);
+      }
+    }
+    // res.json(linePayRes?.data);
   } catch (error) {
     console.log(error);
     res.end();
+  }
+});
+
+router.post("/writeEvaPro", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `product_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaRoom", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `booking_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaRen", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `rental_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+router.post("/writeEvaCamp", async (req, res) => {
+  const { sid, text, star } = req.body;
+  const sql =
+    "UPDATE `campaign_order` SET `star`=?,`message`=?,`messageTime`=NOW(),`created_time`=NOW() WHERE `order_sid`=?";
+  const [rows] = await db.query(sql, [star, text, sid]);
+  res.json(rows);
+});
+// router.get("/mail", (req, res) => {
+//   const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 465,
+//     auth: {
+//       user: "",
+//       pass: "",
+//     },
+//   });
+
+//   transporter
+//     .sendMail({
+//       from: "gohiking@gmail",
+//       to: "game665987@gmail.com",
+//       subject: "訂單成立通知信",
+//       html: "<h1>訂單已成立</h1><p>訂單編號：0000000</p>",
+//     })
+//     .then((res) => {
+//       console.log({ res });
+//     })
+//     .catch(console.error);
+// });
+router.get("/lookEva", async (req, res) => {
+  if (req.query.proSid !== undefined) {
+    const sql =
+      "SELECT * FROM `product_order` join product on product_order.products_sid=product.product_sid WHERE product_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.proSid]);
+    res.json(rows);
+  }
+  if (req.query.roomSid !== undefined) {
+    const sql =
+      "SELECT * FROM `booking_order` join room on booking_order.room_sid=room.room_sid WHERE booking_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.roomSid]);
+    res.json(rows);
+  }
+  if (req.query.renSid !== undefined) {
+    const sql =
+      "SELECT * FROM `rental_order` join rental on rental_order.rental_sid=rental.sid WHERE rental_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.renSid]);
+    rows.map((v) => (v.rental_img = v.rental_img.split(",")));
+    res.json(rows);
+  }
+  if (req.query.campSid !== undefined) {
+    const sql =
+      "SELECT * FROM `campaign_order` join campaign on campaign_order.campaign_sid=campaign.sid WHERE campaign_order.order_sid=?";
+    const [rows] = await db.query(sql, [req.query.campSid]);
+    res.json(rows);
   }
 });
 //建立簽章的function
@@ -114,7 +307,10 @@ function createSignature(uri, linePayBody) {
   return headers;
 }
 
-router.get("/test", (req, res) => {
-  res.json(uuidv4());
-});
+// router.get("/test", (req, res) => {
+//   res.json(uuidv4());
+// });
+// router.post("/test2", (req, res) => {
+//   console.log(req.body);
+// });
 module.exports = router;
