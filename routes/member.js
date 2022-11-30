@@ -331,6 +331,19 @@ router.get("/mountains/api", async (req, res)=> {
 
 })
 
+router.get("/social/api", async (req, res)=> {
+  let sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid ORDER BY posts.post_sid DESC"
+
+  if(req.query.fid) {
+    sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `follows` ON follows.member_sid = posts.member_sid WHERE follows.follow_sid =" + req.query.fid + " ORDER BY posts.post_sid DESC"
+  } 
+
+  const [rows] = await db.query(sql)
+
+  res.json(rows)
+  // res.json(req.query.fid)
+})
+
 // router.use("/api", (req, res, next) => {
 //   const auth = req.get("Authorization")
 

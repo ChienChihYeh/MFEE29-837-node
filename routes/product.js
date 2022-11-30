@@ -3,12 +3,45 @@ const router = express.Router();
 const db = require(__dirname + '/../modules/db_connect2.js');
 const upload = require(__dirname + '/../modules/upload-img')
 
-const  ggender = (rows)=>{
-    const result = rows.filter((v,i)=>{
-        return v.product_category_sid == 9
-    })
-    res.json(result);
-}
+// const getListHandler = async (req, res)=>{
+//     let output = {
+//         perPage: 10,
+//         page: 1,
+//         totalRows: 0,
+//         totalPages: 0,
+//         code: 0,  // 辨識狀態
+//         error: '',
+//         query: {},
+//         rows: []
+//     }
+//     let page = +req.query.page || 1;
+//     let category = req.query.category || '';
+//     //全部
+//     // let all = 
+//     //熱門
+    
+//     // 服飾
+//     // let clothe = ``
+//      // 背包
+
+//      //鞋子
+//      //專業配件
+
+//     if(category=== 'all'){
+//         where += ` AND product_sid LIKE ${ db.escape('%'+category+'%') } `;
+//         output.query.category = category;
+//     }
+//     output.showTest = where;
+//     if(page<1) {
+//         output.code = 410;
+//         output.error = '頁碼太小';
+//         return output;
+//     }
+//     const sql01 = `SELECT COUNT(1) totalRows FROM product ${where} `;
+
+
+//     return output
+// }
 
 
 router.use((req,res,next)=>{
@@ -64,11 +97,26 @@ router.get("/borad/api", async (req, res) => {
     let search = req.query.search
     const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
     const [rows] = await db.query(sql)
-    // console.log(rows);
+    console.log(rows);
     res.json(rows)
   })
 
  
+//-------------------------------------------------------------------------
+
+
+// router.get('/get_produts',async (req,res)=>{
+//   const output =  await getListHandler(req, res);
+//     const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid Desc')
+    
+//     res.json(rows);
+// })
+
+
+
+//-------------------------------------------------------------------------
+
+
 
 
 
@@ -122,6 +170,12 @@ router.get('/brands',async (req,res)=>{
 
 
 
+// router.get('/size',async (req,res)=>{
+//     let name = req.query.name ;
+//     const [rows] = await db.query(`SELECT size FROM product WHERE product_name=${name}`)
+//     console.log(rows);
+//     res.json(rows);
+// })
 
 
 
@@ -148,7 +202,7 @@ router.post('/filter',upload.none(),async(req,res)=>{
 })
 
 
-router.get('/:prodcut_sid',async (req,res)=>{
+router.get('/page/:prodcut_sid',async (req,res)=>{
     const [rows] = await db.query(`SELECT * FROM product WHERE product_sid=${req.params.prodcut_sid}`)
 
 
@@ -158,6 +212,33 @@ router.get('/:prodcut_sid',async (req,res)=>{
         )
     })
    
+    res.json(rows);
+})
+
+//Size
+
+router.get('/size/:prodcut_sid',async (req,res)=>{
+    let Psid = +req.params.prodcut_sid
+    let str = `product_sid=${Psid} OR product_sid=${+Psid+1} OR product_sid=${+Psid+2} OR product_sid=${+Psid+3} OR product_sid=${+Psid+5} OR product_sid=${+Psid+6} OR product_sid=${+Psid+7}`
+    
+    // for (let i=0 ; i<=7 ; i++){
+    //     if(i=0){
+    //         str += `product_sid=${req.params.prodcut_sid} OR `
+    //     }
+    //     else if(i<7){
+            
+    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)} OR `
+    //     }else if(i=7){
+    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)}`
+    //     }
+    //     return
+    // }
+    // ${Sting((Number(req.params.prodcut_sid)+Number(1)))}
+    const [rows] = await db.query(`SELECT size FROM product WHERE ${str}`)
+
+    rows.map((v,i)=>{
+        return v.shoseChose = false
+    })
     res.json(rows);
 })
 
