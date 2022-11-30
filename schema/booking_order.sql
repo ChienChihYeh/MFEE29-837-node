@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-29 01:07:59
+-- 產生時間： 2022-11-30 00:57:17
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,9 +26,9 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `booking_order`
 --
-DROP TABLE IF EXISTS `booking_order`;
+
 CREATE TABLE `booking_order` (
-  `sid` int(11) NOT NULL,
+  `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
   `room_sid` int(11) NOT NULL,
   `start` date DEFAULT NULL,
@@ -46,11 +46,13 @@ CREATE TABLE `booking_order` (
 -- 傾印資料表的資料 `booking_order`
 --
 
-INSERT INTO `booking_order` (`sid`, `order_num`, `room_sid`, `start`, `end`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
+INSERT INTO `booking_order` (`order_sid`, `order_num`, `room_sid`, `start`, `end`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
 (9, '20220922031127', 25, '2022-09-22', '2022-09-24', 1, 300, '', NULL, NULL, NULL, '2022-09-22 15:11:27'),
 (10, '20220923024833', 49, '2022-09-23', '2022-09-30', 4, 2400, '', NULL, NULL, NULL, '2022-09-23 14:48:33'),
 (11, '20220923025328', 49, '2022-09-15', '2022-09-24', 1, 600, '', NULL, NULL, NULL, '2022-09-23 14:53:28'),
-(12, '20220923035111', 49, '2022-09-14', '2022-09-24', 1, 600, '', NULL, NULL, NULL, '2022-09-23 15:51:11');
+(12, '20220923035111', 49, '2022-09-14', '2022-09-24', 1, 600, '', NULL, NULL, NULL, '2022-09-23 15:51:11'),
+(20, '1669685741910', 20, '2022-11-29', '2022-11-30', 1, 3000, 'img', 5, '333', '2022-11-29', '2022-11-29 23:30:07'),
+(21, '1669690525756', 20, '2022-11-29', '2022-11-30', 8, 24000, 'img', 4, '1111', '2022-11-30', '2022-11-30 00:14:26');
 
 --
 -- 已傾印資料表的索引
@@ -60,7 +62,7 @@ INSERT INTO `booking_order` (`sid`, `order_num`, `room_sid`, `start`, `end`, `qt
 -- 資料表索引 `booking_order`
 --
 ALTER TABLE `booking_order`
-  ADD PRIMARY KEY (`sid`);
+  ADD PRIMARY KEY (`order_sid`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -70,7 +72,7 @@ ALTER TABLE `booking_order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `booking_order`
 --
 ALTER TABLE `booking_order`
-  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
