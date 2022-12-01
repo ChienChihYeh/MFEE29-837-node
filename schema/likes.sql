@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-24 03:29:27
+-- 產生時間： 2022-11-30 20:00:39
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,11 +26,25 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `likes`
 --
+
 DROP TABLE IF EXISTS `likes`;
+
 CREATE TABLE `likes` (
   `member_sid` int(11) NOT NULL,
   `post_sid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `likes`
+--
+
+INSERT INTO `likes` (`member_sid`, `post_sid`) VALUES
+(668, 41),
+(669, 39),
+(669, 40),
+(670, 39),
+(670, 41),
+(670, 42);
 
 --
 -- 已傾印資料表的索引

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2022 年 11 月 30 日 17:04
+-- 產生時間： 2022 年 12 月 01 日 14:47
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 DROP TABLE IF EXISTS `campaign_days`;
 CREATE TABLE `campaign_days` (
-  `sid` int(100) NOT NULL,
+  `campday_sid` int(100) NOT NULL,
   `dayname` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -36,7 +36,7 @@ CREATE TABLE `campaign_days` (
 -- 傾印資料表的資料 `campaign_days`
 --
 
-INSERT INTO `campaign_days` (`sid`, `dayname`) VALUES
+INSERT INTO `campaign_days` (`campday_sid`, `dayname`) VALUES
 (1, '一日遊'),
 (2, '兩天一夜'),
 (3, '三天兩夜');
@@ -49,7 +49,7 @@ INSERT INTO `campaign_days` (`sid`, `dayname`) VALUES
 -- 資料表索引 `campaign_days`
 --
 ALTER TABLE `campaign_days`
-  ADD PRIMARY KEY (`sid`);
+  ADD PRIMARY KEY (`campday_sid`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -59,7 +59,7 @@ ALTER TABLE `campaign_days`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `campaign_days`
 --
 ALTER TABLE `campaign_days`
-  MODIFY `sid` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `campday_sid` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-24 03:30:36
+-- 產生時間： 2022-11-30 20:00:54
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,7 +26,9 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `members`
 --
+
 DROP TABLE IF EXISTS `members`;
+
 CREATE TABLE `members` (
   `member_sid` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -123,9 +125,9 @@ INSERT INTO `members` (`member_sid`, `name`, `password`, `email`, `mobile`, `add
 (633, '測試', '$2y$10$i4xue40mjTs64SaNMgmo4.thXVQuj2TGt624flMC3Gz7v705LPfVO', 'test@test.com', '0911223344', '高雄市南台路64號', '1999-09-06', '測試暱稱', 1, 0, '200246559f8227d72de75faaa517ce0d.jpg', '2022-09-21 16:19:04', NULL, NULL, NULL),
 (643, 'test3', '$2y$10$BIRb7p537HhQGIH2vif8Fuz1wZtFekWJdpA8IJRoXcpUdK7trztKu', 'test3@test.com', '0911223344', 'aaa', '2022-08-29', 'test3', 1, 0, '', '2022-09-22 16:33:09', NULL, NULL, NULL),
 (645, 'test4', '$2y$10$0W74nQVUYpEtH0bHlEZiTO609pf59eeY/j/4lYteuQmgdprrA1YGq', 'test4@test.com', '0911223344', 'aaa', '2022-08-28', 'test4', 1, 0, 'b256488ff6bb5a5a2dbdc7c1783d67ef.jpg', '2022-09-22 16:42:14', NULL, NULL, NULL),
-(668, '陳誠成', '2222', 'chen@test.com', '0911223344', '台北市大安路一段1號', '1999-09-09', '阿成', 1, 0, 'ae6fb110-a7bb-4830-8575-341b5b473716.jpg', '2022-11-18 16:46:51', '自介測試\r\n換行測試', NULL, NULL),
-(669, '林陵', '123456', 'lin@test.com', '0911223344', '', '1999-01-01', '林林', 1, 0, NULL, '2022-11-18 16:51:01', '', NULL, NULL),
-(670, '吳梧', '333', 'woo@test.com', '0912345678', '', NULL, '嗚嗚嗚', 1, 6114, 'b915fefc-747e-48c3-9f08-330606dc768c.jpg', '2022-11-21 15:42:08', '唔唔唔\r\n唔唔唔', NULL, NULL);
+(668, '陳誠成', '2222', 'chen@test.com', '0911223344', '台北市大安路一段1號', '1999-09-09', '阿成', 1, 1120, '185ccc3d-f4a3-4d42-8eae-5a1900394942.png', '2022-11-18 16:46:51', '自介測試\r\n換行測試', NULL, NULL),
+(669, '林陵', '123456', 'lin@test.com', '0911223344', '', '1999-01-01', '林林', 1, 2240, '', '2022-11-18 16:51:01', '我的自介\r\n1\r\n2\r\n3', NULL, NULL),
+(670, '吳梧', '333', 'woo@test.com', '0912345678', '', NULL, '嗚嗚嗚', 1, 7225, 'b915fefc-747e-48c3-9f08-330606dc768c.jpg', '2022-11-21 15:42:08', '唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔唔\r\n唔唔唔', NULL, NULL);
 
 --
 -- 已傾印資料表的索引

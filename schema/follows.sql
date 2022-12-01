@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-24 03:28:52
+-- 產生時間： 2022-11-30 20:00:17
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `follows`
 --
-DROP TABLE IF EXISTS follows;
+DROP TABLE IF EXISTS `follows`;
 
 CREATE TABLE `follows` (
   `member_sid` int(11) NOT NULL,
@@ -41,7 +41,10 @@ INSERT INTO `follows` (`member_sid`, `follow_sid`) VALUES
 (591, 535),
 (591, 580),
 (600, 580),
-(600, 599);
+(600, 599),
+(668, 670),
+(669, 670),
+(670, 669);
 
 --
 -- 已傾印資料表的索引
