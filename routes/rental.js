@@ -3,9 +3,9 @@ const router = express.Router();
 const db = require(__dirname + "/../modules/db_connect2.js");
 const upload = require(__dirname + "/../modules/upload-img.js");
 const fetch = require("node-fetch");
-const axios = require("axios")
+const axios = require("axios");
 
-//商品大頁搜尋
+//商品大頁搜尋 廢棄
 async function api(req) {
   const sql = `SELECT * FROM rental `;
   [rows] = await db.query(sql);
@@ -32,6 +32,15 @@ async function getPageData(req) {
   const perPage = 20;
   let page = +req.query.page || 1;
 
+  let order_by = "";
+  if (req.query.order_by === "price_DESC") {
+    order_by = "rental_price DESC";
+  } else if (req.query.order_by === "price_ASC") {
+    order_by = "rental_price ASC";
+  } else {
+    order_by = "sid DESC";
+  }
+
   let search = req.query.search ? req.query.search.trim() : "";
   let where = `WHERE 1 `;
   if (search) {
@@ -45,11 +54,12 @@ async function getPageData(req) {
   if (count > 0) {
     totalPages = Math.ceil(count / perPage);
   }
-  const sql = `SELECT * FROM rental  ${where} ORDER  BY sid DESC LIMIT ${
+  const sql = `SELECT * FROM rental  ${where} ORDER  BY ${order_by} LIMIT ${
     (page - 1) * perPage
   },${perPage} `;
   [rows] = await db.query(sql);
 
+  //這邊單純是我的資料加工成我要的樣子
   rows.map((v, i) => {
     return (v.rental_img = v.rental_img.split(","));
   });
@@ -59,7 +69,6 @@ async function getPageData(req) {
   return { rows, count, totalPages };
 }
 router.get("/pageApi", async (req, res) => {
-  // const {rows, count, totalPages} = await getPageData(req);
   res.json(await getPageData(req));
 });
 
@@ -101,7 +110,7 @@ async function getLike(req) {
 router.get("/getLike", async (req, res) => {
   res.json(await getLike(req));
 });
-//商品名稱模糊搜尋
+//商品名稱模糊搜尋 廢棄
 async function getSearchData(req) {
   const { search } = req.query;
   const sql = `SELECT * FROM rental where rental_name LIKE "%${search}%"`;
@@ -142,7 +151,8 @@ router.post("/ai", upload.none(), async (req, res) => {
       // console.log(obj);
       const reply = obj.answers[0];
       res.send(reply);
-    });1
+    });
+  1;
 });
 
 module.exports = router;
