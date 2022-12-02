@@ -7,7 +7,8 @@ const axios = require("axios");
 
 //商品大頁搜尋 廢棄
 async function api(req) {
-  const sql = `SELECT * FROM rental `;
+  // const sql = `SELECT * FROM "rental" WHERE 1 AND "rental_brand" IN ("TiiTENT","Snow Peak")`;//這個是錯誤的由於標點符號
+  const sql = `SELECT * FROM \`rental\` WHERE 1 AND \`rental_brand\` IN ("TiiTENT","Snow Peak")`;
   [rows] = await db.query(sql);
   const sql2 = `SELECT COUNT(1) FROM rental`;
   [[count]] = await db.query(sql2);
@@ -32,6 +33,7 @@ async function getPageData(req) {
   const perPage = 20;
   let page = +req.query.page || 1;
 
+  //看看有沒有要求排序
   let order_by = "";
   if (req.query.order_by === "price_DESC") {
     order_by = "rental_price DESC";
@@ -41,13 +43,26 @@ async function getPageData(req) {
     order_by = "sid DESC";
   }
 
+  //看看有沒走要字串搜尋
   let search = req.query.search ? req.query.search.trim() : "";
   let where = `WHERE 1 `;
+
+  console.log(req.query.brand);
+  let brand = req.query.brand ? req.query.brand.trim() : "";
+  
+  if (brand) {
+    const brandwords = brand.split(",");
+    where += `AND \`rental_brand\` in ('${brandwords.join("','")}')`;
+  }
+
   if (search) {
     where += `AND (\`rental_name\` LIKE ${db.escape("%" + search + "%")})`;
   }
-  const sql1 = `SELECT COUNT(1) count FROM rental ${where} `;
 
+  const sql1 = `SELECT COUNT(1) count FROM rental ${where} `;
+//  "TiiTENT","Snow Peak"
+  console.log(sql1);
+  console.log(sql1);
   [[{ count }]] = await db.query(sql1);
   let totalPages = 0;
   let rows = [];
@@ -111,22 +126,22 @@ router.get("/getLike", async (req, res) => {
   res.json(await getLike(req));
 });
 //商品名稱模糊搜尋 廢棄
-async function getSearchData(req) {
-  const { search } = req.query;
-  const sql = `SELECT * FROM rental where rental_name LIKE "%${search}%"`;
-  [rows] = await db.query(sql);
-  rows.map((v, i) => {
-    return (v.rental_img = v.rental_img.split(","));
-  });
-  rows.map((v, i) => {
-    return (v.rental_label = v.rental_label.split(","));
-  });
-  console.log(rows);
-  return { rows };
-}
-router.get("/getSearchData", async (req, res) => {
-  res.json(await getSearchData(req));
-});
+// async function getSearchData(req) {
+//   const { search } = req.query;
+//   const sql = `SELECT * FROM rental where rental_name LIKE "%${search}%"`;
+//   [rows] = await db.query(sql);
+//   rows.map((v, i) => {
+//     return (v.rental_img = v.rental_img.split(","));
+//   });
+//   rows.map((v, i) => {
+//     return (v.rental_label = v.rental_label.split(","));
+//   });
+//   console.log(rows);
+//   return { rows };
+// }
+// router.get("/getSearchData", async (req, res) => {
+//   res.json(await getSearchData(req));
+// });
 
 //Azure 串接
 router.post("/ai", upload.none(), async (req, res) => {
@@ -136,8 +151,7 @@ router.post("/ai", upload.none(), async (req, res) => {
   const question = {
     question: req.body.question,
   };
-  // fd = new FormData("question",req.body.question)
-  // response = await axios.post(url,fd)
+
   fetch(url, {
     method: "POST",
     body: JSON.stringify(question),

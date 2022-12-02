@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-30 20:00:54
+-- 產生時間： 2022-12-01 15:45:05
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,8 +26,6 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `members`
 --
-
-DROP TABLE IF EXISTS `members`;
 
 CREATE TABLE `members` (
   `member_sid` int(11) NOT NULL,
