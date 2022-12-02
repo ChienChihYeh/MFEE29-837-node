@@ -53,12 +53,15 @@ router.use((req,res,next)=>{
 router.get("/borad/api", async (req, res) => {
     if(req.query.mid){
         let mid = req.query.mid;
-        let mStr = 'member_sid =';
+        let mStr = 'member_sid = ';
         const sql = 'SELECT follows.follow_sid FROM `members` join `follows` on members.member_sid = follows.member_sid  WHERE members.member_sid = ?'
         const [rows] = await db.query(sql, mid)
     
+        if(rows.length > 0){
+
         const FollowsId = rows.map((v, i) => {
-            if(i+1 < rows.length  ){
+            
+            if(i+1 <= rows.length  ){
                 mStr += `${v.follow_sid} OR member_sid = `
             }else{
                 mStr +=`${v.follow_sid} ORDER BY total_height DESC`
@@ -73,13 +76,15 @@ router.get("/borad/api", async (req, res) => {
           
         
           const [rows0] = await db.query(sql2)
-        //   console.log(rows0);
-          
-        res.json(rows0)
+        
+            return res.json(rows0)
+        }else if(rows.length === 0){
+            return  res.json(rows)
+        }
+
     }else{
         return
     }
-    
   })
 
 
