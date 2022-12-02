@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-24 03:31:21
+-- 產生時間： 2022-11-30 20:01:31
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,7 +26,9 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `posts`
 --
+
 DROP TABLE IF EXISTS `posts`;
+
 CREATE TABLE `posts` (
   `post_sid` int(11) NOT NULL,
   `member_sid` int(11) NOT NULL,
@@ -43,9 +45,13 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`post_sid`, `member_sid`, `image_url`, `context`, `mountain_sid`, `likes`, `comments`, `created_at`) VALUES
-(12, 670, 'e82b1104-1d3b-4d59-bb8c-667585b9a3e3.jpg', '山高度累加測試\r\n1\r\n2\r\n3', 18, 0, 0, '2022-11-23'),
-(13, 670, '052c2ca6-6c33-4760-8d31-4a0f9c81a1af.jpg', '預覽圖清空測試', 75, 0, 0, '2022-11-23'),
-(14, 670, 'e3948838-9458-4ef8-a75d-bd8178d049e2.jpg', '', 156, 0, 0, '2022-11-23');
+(39, 669, 'bcac7f95-084a-483d-8873-b7e85ad5837b.jpg', '你好', 156, 2, 2, '2022-11-25'),
+(40, 669, 'a16ed58a-bf6d-4197-8726-11d51ddc82a7.jpg', 'profile test', 156, 1, 1, '2022-11-25'),
+(41, 668, '128ed5b4-1c36-4a59-98e1-a693d87e17f8.jpg', '', 156, 2, 1, '2022-11-28'),
+(42, 670, '7efa35b4-e742-4f7c-af51-b5e384fad514.jpg', '', 27, 1, 0, '2022-11-28'),
+(45, 670, '0fedf9ed-7e28-4530-885a-5a392fdf2de7.jpg', '', 161, 0, 0, '2022-11-29'),
+(46, 670, '4525fa39-a501-4524-95aa-1487801ab605.jpg', '', 72, 0, 0, '2022-11-29'),
+(47, 670, '690cd9dd-69e9-46a1-a9a3-8d240e3af5bb.jpg', 'Happy~~!', 147, 0, 1, '2022-11-29');
 
 --
 -- 已傾印資料表的索引
@@ -65,7 +71,7 @@ ALTER TABLE `posts`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `post_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `post_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2022 年 11 月 30 日 17:04
+-- 產生時間： 2022 年 12 月 01 日 14:47
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -27,7 +27,6 @@ SET time_zone = "+00:00";
 -- 資料表結構 `campaign`
 --
 DROP TABLE IF EXISTS `campaign`;
-
 CREATE TABLE `campaign` (
   `sid` int(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -121,8 +120,8 @@ ALTER TABLE `campaign`
 -- 資料表的限制式 `campaign`
 --
 ALTER TABLE `campaign`
-  ADD CONSTRAINT `campaign_ibfk_1` FOREIGN KEY (`location_sid`) REFERENCES `location` (`sid`),
-  ADD CONSTRAINT `campaign_ibfk_2` FOREIGN KEY (`campaign_days_sid`) REFERENCES `campaign_days` (`sid`);
+  ADD CONSTRAINT `campaign_ibfk_1` FOREIGN KEY (`location_sid`) REFERENCES `location` (`location_sid`),
+  ADD CONSTRAINT `campaign_ibfk_2` FOREIGN KEY (`campaign_days_sid`) REFERENCES `campaign_days` (`campday_sid`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

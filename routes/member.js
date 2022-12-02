@@ -367,7 +367,7 @@ router.get("/social/api", async (req, res)=> {
 
 router.put("/post/api", [auth, upload.none()], async(req, res) => {
   let mid = 0
- 
+ f
   console.log(req.body.context)
    
   const output = {
@@ -454,6 +454,38 @@ router.get("/api", auth, async (req, res) => {
   }
 })
 
+router.put("/api/pass", [auth, upload.none()], async (req, res) => {
+  // return res.json(res.locals.loginUser.member_sid)
+  // 測試傳過來的body
+
+  const output = {
+    success: false,
+    code: 0,
+    error: {},
+    postData: req.body,
+    //for debug
+  }
+
+  // console.log(res.locals.loginUser.member_sid)
+
+  const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
+
+  const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
+
+  if (rows[0] && rows[0].password === req.body.password) {
+    const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
+    const [result] = await db.query(sql, [
+      req.body.newPass,
+      res.locals.loginUser.member_sid,
+    ])
+    if (result.affectedRows) output.success = true
+    // console.log(result);
+    // console.log(result.affectedRows);
+  }
+
+  res.json(output)
+})
+
 router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
   const output = {
     success: false,
@@ -526,36 +558,5 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
   res.json(output)
 })
 
-router.put("/api/pass", [auth, upload.none()], async (req, res) => {
-  // return res.json(res.locals.loginUser.member_sid)
-  // 測試傳過來的body
-
-  const output = {
-    success: false,
-    code: 0,
-    error: {},
-    postData: req.body,
-    //for debug
-  }
-
-  // console.log(res.locals.loginUser.member_sid)
-
-  const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
-
-  const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
-
-  if (rows[0] && rows[0].password === req.body.password) {
-    const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
-    const [result] = await db.query(sql, [
-      req.body.newPass,
-      res.locals.loginUser.member_sid,
-    ])
-    if (result.affectedRows) output.success = true
-    // console.log(result);
-    // console.log(result.affectedRows);
-  }
-
-  res.json(output)
-})
 
 module.exports = router

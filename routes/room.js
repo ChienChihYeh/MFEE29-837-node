@@ -105,4 +105,15 @@ router.get('/getRoomDetail/:room_sid', async (req, res)=>{
     res.json({rows:rows});
 });
 
+//爬山折價券
+
+router.get('/coupon',async (req,res)=>{
+    const {coupon_sid}=req.query
+    const [couponRows] = await db.query(`SELECT * FROM coupon`) 
+   
+    res.json({
+        couponRows:couponRows,
+        });
+})
+
 module.exports = router;
