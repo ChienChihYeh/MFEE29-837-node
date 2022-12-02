@@ -25,7 +25,11 @@ router.get('/:sid',async (req,res)=>{
   }
   console.log(where)
     const [rows] = await db.query(`SELECT * FROM \`campaign\` JOIN \`location\` ON \`campaign\`.\`location_sid\` =\`location\`.\`location_sid\` JOIN \`mountain\` ON \`campaign\`.\`mountain_sid\` =\`mountain\`.\`mountain_sid\` ${where}`)
-      res.json(rows);
+      
+
+      rows.map((v, i) =>  v.detailImages = v.detailImages.split(', ')
+    )
+    res.json(rows);
 })
 
 
