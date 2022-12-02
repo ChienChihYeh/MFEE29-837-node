@@ -8,7 +8,7 @@ const { dirname } = require("path")
 const sharp = require('sharp');
 const { auth } = require(__dirname + "/../modules/auth.js")
 
-//TODO 註冊驗證 密碼變更驗證 全體/關注中貼文牆API
+//TODO 信箱重複驗證 (join, put)
 
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
@@ -25,7 +25,7 @@ router.post("/login/api", upload.none(), async (req, res) => {
     token: "",
   }
 
-  const [result] = await db.query(sql, [req.body.email])
+  const [result] = await db.query(sql, [req.body.email.toLowerCase()])
 
   if (
     result[0] &&
@@ -60,10 +60,10 @@ router.post("/join/api", upload.none(), async (req, res) => {
   const [result] = await db.query(sql, [
     req.body.name,
     req.body.password,
-    req.body.email,
+    req.body.email.toLowerCase(),
     req.body.mobile,
     req.body.address,
-    req.body.birthday,
+    req.body.birthday === ''? null :req.body.birthday,
     req.body.nickname,
     req.body.intro,
   ])
@@ -71,7 +71,7 @@ router.post("/join/api", upload.none(), async (req, res) => {
   console.log(result)
 
   const sqlNew = "SELECT * FROM `members` WHERE `email` = ?"
-  const [resultNew] = await db.query(sqlNew, [req.body.email])
+  const [resultNew] = await db.query(sqlNew, [req.body.email.toLowerCase()])
   const token = jwt.sign({ member_sid: resultNew[0].member_sid }, "hiking1214")
 
   if (result.affectedRows) {
@@ -541,10 +541,10 @@ router.put("/api", [ auth, upload.single("avatar")], async (req, res) => {
 
   const [result] = await db.query(sql, [
     req.body.name,
-    req.body.email,
+    req.body.email.toLowerCase(),
     req.body.mobile,
     req.body.address,
-    req.body.birthday || null,
+    req.body.birthday === ''? null :req.body.birthday,
     req.body.nickname,
     avatarFilename,
     req.body.intro,
