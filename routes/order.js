@@ -244,15 +244,15 @@ router.post("/writeEvaCamp", async (req, res) => {
 //     host: "smtp.gmail.com",
 //     port: 465,
 //     auth: {
-//       user: "",
-//       pass: "",
+//       user: MAIL_USERNAME,
+//       pass: MAIL_PASSWORD,
 //     },
 //   });
 
 //   transporter
 //     .sendMail({
-//       from: "gohiking@gmail",
-//       to: "game665987@gmail.com",
+//       from: "gohiking837@gmail.com",
+//       to: "buyuser1214@gmail.com",
 //       subject: "訂單成立通知信",
 //       html: "<h1>訂單已成立</h1><p>訂單編號：0000000</p>",
 //     })
