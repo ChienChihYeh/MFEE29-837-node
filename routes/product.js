@@ -61,9 +61,11 @@ router.get("/borad/api", async (req, res) => {
 
         const FollowsId = rows.map((v, i) => {
             
-            if(i+1 <= rows.length  ){
-                mStr += `${v.follow_sid} OR member_sid = `
-            }else{
+            if(rows.length===1 && i===0){
+                mStr += `${v.follow_sid}`
+            }else if(i!==0 && rows.length+1 !== i){
+                mStr += `OR member_sid = ${v.follow_sid}`
+            }else if(i === rows.length+1){
                 mStr +=`${v.follow_sid} ORDER BY total_height DESC`
             }
           })
