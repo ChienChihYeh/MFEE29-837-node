@@ -18,6 +18,7 @@ const {
   LINEPAY_RETURN_CANCEL_URL,
   MAIL_USERNAME,
   MAIL_PASSWORD,
+  PHOTO,
 } = process.env;
 const moneyFormat = (price) => {
   let a = Number(price);
@@ -178,7 +179,9 @@ router.get("/pay/confirm", async (req, res) => {
           ]);
         }
       }
-
+      const [whoUser] = await db.query(
+        `SELECT nickname FROM members WHERE member_sid=${totalOrder.memberSid}`
+      );
       if (rows.affectedRows) {
         const transporter = nodemailer.createTransport({
           host: "smtp.gmail.com",
@@ -193,9 +196,34 @@ router.get("/pay/confirm", async (req, res) => {
             from: "gohiking837@gmail.com",
             to: "buyuser1214@gmail.com",
             subject: "訂單成立通知信",
-            html: `<h1>訂單已成立</h1><p>訂單編號：${orderId}</p> <p style='color:red'>總金額:${moneyFormat(
-              totalOrder.totalPrice
-            )}</p>`,
+            // html: `<h1>訂單已成立</h1><p>訂單編號：${orderId}</p> <p style='color:red'>總金額:${moneyFormat(
+            //   totalOrder.totalPrice
+            // )}</p>`,
+            html: `<div class="container" style='width: 500px; height: 500px;
+            border: 1px solid black;
+            border-radius: 10px;
+            overflow: hidden;'>
+                    <div class="imgWrap" style='width: 500px;
+                    height: 200px;
+                    background-color: #01170d;
+                    border-bottom: 1px solid black;'>
+                      <img src=${PHOTO} alt="" style="width: 100%;
+                      height: 100%;
+                      object-fit: contain;">
+                    </div>
+                      <p style='font-size: 20px;
+                      margin-left: 5px;'>親愛的：<span style='font-weight: 700;'>${
+                        whoUser[0].nickname
+                      }</span>，感謝您的購買</p>
+                      <p style='font-size: 20px;
+                      margin-left: 5px;'>您的訂單編號為：${orderId}</p>
+                      <p style='font-size: 20px;
+                      margin-left: 5px;'>訂單總金額：${moneyFormat(
+                        totalOrder.totalPrice
+                      )}</p>
+                      <p style='font-size: 20px;
+                      margin-left: 5px;'>詳細訂單連結：http://localhost:3000/member/orders</p>
+                  </div>`,
           })
           .then((res) => {
             console.log({ res });
@@ -307,8 +335,12 @@ function createSignature(uri, linePayBody) {
   return headers;
 }
 
-// router.get("/test", (req, res) => {
+// router.get("/test", async (req, res) => {
+//   const [whoUser] = await db.query(
+//     `SELECT nickname FROM members WHERE member_sid=647`
+//   );
 //   res.json(uuidv4());
+//   res.json(whoUser[0].nickname);
 // });
 // router.post("/test2", (req, res) => {
 //   console.log(req.body);
