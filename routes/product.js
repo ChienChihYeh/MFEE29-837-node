@@ -2,46 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require(__dirname + '/../modules/db_connect2.js');
 const upload = require(__dirname + '/../modules/upload-img')
-
-// const getListHandler = async (req, res)=>{
-//     let output = {
-//         perPage: 10,
-//         page: 1,
-//         totalRows: 0,
-//         totalPages: 0,
-//         code: 0,  // 辨識狀態
-//         error: '',
-//         query: {},
-//         rows: []
-//     }
-//     let page = +req.query.page || 1;
-//     let category = req.query.category || '';
-//     //全部
-//     // let all = 
-//     //熱門
-    
-//     // 服飾
-//     // let clothe = ``
-//      // 背包
-
-//      //鞋子
-//      //專業配件
-
-//     if(category=== 'all'){
-//         where += ` AND product_sid LIKE ${ db.escape('%'+category+'%') } `;
-//         output.query.category = category;
-//     }
-//     output.showTest = where;
-//     if(page<1) {
-//         output.code = 410;
-//         output.error = '頁碼太小';
-//         return output;
-//     }
-//     const sql01 = `SELECT COUNT(1) totalRows FROM product ${where} `;
-
-
-//     return output
-// }
+const fs = require("fs")
 
 
 router.use((req,res,next)=>{
@@ -111,21 +72,7 @@ router.get("/borad/api", async (req, res) => {
  
 //-------------------------------------------------------------------------
 
-
-// router.get('/get_produts',async (req,res)=>{
-//   const output =  await getListHandler(req, res);
-//     const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid Desc')
-    
-//     res.json(rows);
-// })
-
-
-
 //-------------------------------------------------------------------------
-
-
-
-
 
 
 
@@ -175,14 +122,13 @@ router.get('/brands',async (req,res)=>{
     res.json(rows);
 })
 
+//客製化
+router.get('/custom',async (req,res)=>{
+    const [rows] = await db.query(`SELECT distinct p.brand_sid,b.brand_name FROM product as p JOIN brand as b ON p.brand_sid = b.brand_sid`)
+    res.json(rows);
+})
 
 
-// router.get('/size',async (req,res)=>{
-//     let name = req.query.name ;
-//     const [rows] = await db.query(`SELECT size FROM product WHERE product_name=${name}`)
-//     console.log(rows);
-//     res.json(rows);
-// })
 
 
 
@@ -227,20 +173,7 @@ router.get('/page/:prodcut_sid',async (req,res)=>{
 router.get('/size/:prodcut_sid',async (req,res)=>{
     let Psid = +req.params.prodcut_sid
     let str = `product_sid=${Psid} OR product_sid=${+Psid+1} OR product_sid=${+Psid+2} OR product_sid=${+Psid+3} OR product_sid=${+Psid+5} OR product_sid=${+Psid+6} OR product_sid=${+Psid+7}`
-    
-    // for (let i=0 ; i<=7 ; i++){
-    //     if(i=0){
-    //         str += `product_sid=${req.params.prodcut_sid} OR `
-    //     }
-    //     else if(i<7){
-            
-    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)} OR `
-    //     }else if(i=7){
-    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)}`
-    //     }
-    //     return
-    // }
-    // ${Sting((Number(req.params.prodcut_sid)+Number(1)))}
+
     const [rows] = await db.query(`SELECT size FROM product WHERE ${str}`)
 
     rows.map((v,i)=>{
