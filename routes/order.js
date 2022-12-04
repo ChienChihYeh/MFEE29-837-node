@@ -72,7 +72,7 @@ router.post("/createOrder", async (req, res) => {
         cancelUrl: `${LINEPAY_RETURN_HOST}/${LINEPAY_RETURN_CANCEL_URL}`,
       },
     };
-    // const jsonStr = JSON.stringify(linePayBody);
+
     const uri = "/payments/request";
     const headers = createSignature(uri, linePayBody);
 
@@ -196,9 +196,6 @@ router.get("/pay/confirm", async (req, res) => {
             from: "gohiking837@gmail.com",
             to: "buyuser1214@gmail.com",
             subject: "訂單成立通知信",
-            // html: `<h1>訂單已成立</h1><p>訂單編號：${orderId}</p> <p style='color:red'>總金額:${moneyFormat(
-            //   totalOrder.totalPrice
-            // )}</p>`,
             html: `<div class="container" style='width: 500px; height: 500px;
             border: 1px solid black;
             border-radius: 10px;
@@ -238,7 +235,7 @@ router.get("/pay/confirm", async (req, res) => {
     res.end();
   }
 });
-
+//寫評價
 router.post("/writeEvaPro", async (req, res) => {
   const { sid, text, star } = req.body;
   const sql =
@@ -289,6 +286,8 @@ router.post("/writeEvaCamp", async (req, res) => {
 //     })
 //     .catch(console.error);
 // });
+
+//看評價
 router.get("/lookEva", async (req, res) => {
   if (req.query.proSid !== undefined) {
     const sql =
