@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-11-30 20:01:45
+-- 產生時間： 2022-12-05 18:11:54
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -27,8 +27,6 @@ SET time_zone = "+00:00";
 -- 資料表結構 `replies`
 --
 
-DROP TABLE IF EXISTS `replies`;
-
 CREATE TABLE `replies` (
   `sid` int(11) NOT NULL,
   `post_sid` int(11) NOT NULL,
@@ -37,17 +35,6 @@ CREATE TABLE `replies` (
   `context` varchar(255) NOT NULL,
   `datetime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- 傾印資料表的資料 `replies`
---
-
-INSERT INTO `replies` (`sid`, `post_sid`, `parent_sid`, `member_sid`, `context`, `datetime`) VALUES
-(9, 39, NULL, 670, '你好', '2022-11-25 15:39:47'),
-(10, 40, NULL, 670, 'Hi', '2022-11-25 15:58:50'),
-(12, 41, NULL, 668, 'Hi', '2022-11-28 23:47:30'),
-(14, 39, NULL, 669, 'Hi', '2022-12-01 00:27:59'),
-(15, 47, NULL, 669, '好看', '2022-12-01 02:36:15');
 
 --
 -- 已傾印資料表的索引
@@ -67,7 +54,7 @@ ALTER TABLE `replies`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `replies`
 --
 ALTER TABLE `replies`
-  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
