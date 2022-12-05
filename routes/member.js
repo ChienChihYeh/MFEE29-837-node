@@ -6,9 +6,10 @@ const fs = require("fs")
 const jwt = require("jsonwebtoken")
 const { dirname } = require("path")
 const sharp = require('sharp');
+const bcrypt = require('bcrypt');
 const { auth } = require(__dirname + "/../modules/auth.js")
 
-//TODO 註冊驗證 密碼變更驗證 全體/關注中貼文牆API
+//TODO bcrypt測試
 
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
@@ -30,7 +31,7 @@ router.post("/login/api", upload.none(), async (req, res) => {
   if (
     result[0] &&
     req.body.password &&
-    req.body.password === result[0].password
+    bcrypt.compare(req.body.password, result[0].password)
   ) {
     const token = jwt.sign({ member_sid: result[0].member_sid }, "hiking1214")
 
@@ -54,12 +55,14 @@ router.post("/join/api", upload.none(), async (req, res) => {
     //for debug
   }
 
+  const passBcrypt = bcrypt.hashSync(req.body.password, 10)
+
   const sql =
     "INSERT INTO `members`(`name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `intro`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
 
   const [result] = await db.query(sql, [
     req.body.name,
-    req.body.password,
+    passBcrypt,
     req.body.email,
     req.body.mobile,
     req.body.address,
@@ -542,12 +545,14 @@ router.put("/api/pass", [auth, upload.none()], async (req, res) => {
 
   const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
 
+  const passBcrypt = bcrypt.hashSync(req.body.newPass, 10)
+
   const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
 
-  if (rows[0] && rows[0].password === req.body.password) {
+  if (rows[0] && bcrypt.compare(req.body.password, rows[0].password)) {
     const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
     const [result] = await db.query(sql, [
-      req.body.newPass,
+      passBcrypt,
       res.locals.loginUser.member_sid,
     ])
     if (result.affectedRows) output.success = true
