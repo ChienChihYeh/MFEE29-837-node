@@ -16,7 +16,7 @@ const session = require("express-session");
 const MysqlStore = require("express-mysql-session")(session);
 const sessionStore = new MysqlStore({}, db);
 const cors = require("cors");
-
+const myParser = require("body-parser");
 
 
 //top-Level middleware
@@ -32,8 +32,8 @@ app.use(cors(corsOptions))
 
 //top-Level middleware
 //解析urlencoded,json放到req.body裡
-app.use(express.urlencoded({extended:false}))
-app.use(express.json())
+app.use(myParser.json({limit : '50mb'}));  
+app.use(myParser.urlencoded({limit : '50mb',extended:true})); 
 //上傳圖片
 const upload = require(__dirname + '/modules/upload-img')
 //根目錄
