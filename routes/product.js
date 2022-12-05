@@ -126,21 +126,11 @@ router.get('/brands',async (req,res)=>{
 })
 
 //客製化
-router.post('/custom',async (req,res)=>{
-    if(req.body.customImage){
-        const path ='../public/imgs/zx/' + Date.now()+'.png';
-      const  customImg = req.body.customImage
-      const base64 =customImg.replace(/^data:image\/png+;base64,/,"");
-      const dataBuffer =new Buffer.from(base64,'base64')
-      fs.writeFile(path,dataBuffer,function(err){
-        if(err){
-            res.send(err);
-        }else{
-            console.log('OK');
-            res.send('成功');
-        }
-      })
-    }
+router.post('/custom', upload.single("avatar"),async (req,res)=>{
+   let  avatarFilename = req.file.filename
+   console.log(avatarFilename);
+   res.json(avatarFilename)
+
 })
 
 
