@@ -117,7 +117,19 @@ router.get("/pay/confirm", async (req, res) => {
       ]);
       if (pro) {
         for (let i = 0; i < pro.length; i++) {
-          const proOrder =
+          if( pro[i].sid == 719 ||  pro[i].sid == 720 ||  pro[i].sid == 721 ||  pro[i].sid == 722 ){
+            const proOrder =
+            "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `custom_img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+          const [proRows] = await db.query(proOrder, [
+            orderId,
+            pro[i].sid,
+            pro[i].size || "",
+            pro[i].quantity,
+            pro[i].quantity * pro[i].price,
+            pro[i].img,
+          ]);
+          }else{
+            const proOrder =
             "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
           const [proRows] = await db.query(proOrder, [
             orderId,
@@ -127,6 +139,8 @@ router.get("/pay/confirm", async (req, res) => {
             pro[i].quantity * pro[i].price,
             pro[i].img,
           ]);
+          }
+          
         }
       }
       if (room) {
