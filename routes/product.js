@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require(__dirname + '/../modules/db_connect2.js');
 const upload = require(__dirname + '/../modules/upload-img')
-const fs = require("fs")
+const fs = require("fs").promises
+
+
+
 
 
 router.use((req,res,next)=>{
-    req.body.gender
+    
     next()
 })
 
@@ -123,9 +126,21 @@ router.get('/brands',async (req,res)=>{
 })
 
 //客製化
-router.get('/custom',async (req,res)=>{
-    const [rows] = await db.query(`SELECT distinct p.brand_sid,b.brand_name FROM product as p JOIN brand as b ON p.brand_sid = b.brand_sid`)
-    res.json(rows);
+router.post('/custom',async (req,res)=>{
+    if(req.body.customImage){
+        const path ='../public/imgs/zx/' + Date.now()+'.png';
+      const  customImg = req.body.customImage
+      const base64 =customImg.replace(/^data:image\/png+;base64,/,"");
+      const dataBuffer =new Buffer.from(base64,'base64')
+      fs.writeFile(path,dataBuffer,function(err){
+        if(err){
+            res.send(err);
+        }else{
+            console.log('OK');
+            res.send('成功');
+        }
+      })
+    }
 })
 
 
