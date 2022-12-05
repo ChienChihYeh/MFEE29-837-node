@@ -2,50 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require(__dirname + '/../modules/db_connect2.js');
 const upload = require(__dirname + '/../modules/upload-img')
-
-// const getListHandler = async (req, res)=>{
-//     let output = {
-//         perPage: 10,
-//         page: 1,
-//         totalRows: 0,
-//         totalPages: 0,
-//         code: 0,  // 辨識狀態
-//         error: '',
-//         query: {},
-//         rows: []
-//     }
-//     let page = +req.query.page || 1;
-//     let category = req.query.category || '';
-//     //全部
-//     // let all = 
-//     //熱門
-    
-//     // 服飾
-//     // let clothe = ``
-//      // 背包
-
-//      //鞋子
-//      //專業配件
-
-//     if(category=== 'all'){
-//         where += ` AND product_sid LIKE ${ db.escape('%'+category+'%') } `;
-//         output.query.category = category;
-//     }
-//     output.showTest = where;
-//     if(page<1) {
-//         output.code = 410;
-//         output.error = '頁碼太小';
-//         return output;
-//     }
-//     const sql01 = `SELECT COUNT(1) totalRows FROM product ${where} `;
+const fs = require("fs").promises
 
 
-//     return output
-// }
+
 
 
 router.use((req,res,next)=>{
-    req.body.gender
+    
     next()
 })
 
@@ -53,14 +17,19 @@ router.use((req,res,next)=>{
 router.get("/borad/api", async (req, res) => {
     if(req.query.mid){
         let mid = req.query.mid;
-        let mStr = 'member_sid =';
+        let mStr = 'member_sid = ';
         const sql = 'SELECT follows.follow_sid FROM `members` join `follows` on members.member_sid = follows.member_sid  WHERE members.member_sid = ?'
         const [rows] = await db.query(sql, mid)
     
+        if(rows.length > 0){
+
         const FollowsId = rows.map((v, i) => {
-            if(i+1 < rows.length  ){
-                mStr += `${v.follow_sid} OR member_sid = `
-            }else{
+            
+            if(rows.length===1 && i===0){
+                mStr += `${v.follow_sid}`
+            }else if(i!==0 && rows.length+1 !== i){
+                mStr += `OR member_sid = ${v.follow_sid}`
+            }else if(i === rows.length+1){
                 mStr +=`${v.follow_sid} ORDER BY total_height DESC`
             }
           })
@@ -73,13 +42,15 @@ router.get("/borad/api", async (req, res) => {
           
         
           const [rows0] = await db.query(sql2)
-        //   console.log(rows0);
-          
-        res.json(rows0)
+        
+            return res.json(rows0)
+        }else if(rows.length === 0){
+            return  res.json(rows)
+        }
+
     }else{
         return
     }
-    
   })
 
 
@@ -104,21 +75,7 @@ router.get("/borad/api", async (req, res) => {
  
 //-------------------------------------------------------------------------
 
-
-// router.get('/get_produts',async (req,res)=>{
-//   const output =  await getListHandler(req, res);
-//     const [rows] = await db.query('SELECT * FROM product GROUP BY product_name ORDER BY product_sid Desc')
-    
-//     res.json(rows);
-// })
-
-
-
 //-------------------------------------------------------------------------
-
-
-
-
 
 
 
@@ -168,14 +125,25 @@ router.get('/brands',async (req,res)=>{
     res.json(rows);
 })
 
+//客製化
+router.post('/custom',async (req,res)=>{
+    if(req.body.customImage){
+        const path ='../public/imgs/zx/' + Date.now()+'.png';
+      const  customImg = req.body.customImage
+      const base64 =customImg.replace(/^data:image\/png+;base64,/,"");
+      const dataBuffer =new Buffer.from(base64,'base64')
+      fs.writeFile(path,dataBuffer,function(err){
+        if(err){
+            res.send(err);
+        }else{
+            console.log('OK');
+            res.send('成功');
+        }
+      })
+    }
+})
 
 
-// router.get('/size',async (req,res)=>{
-//     let name = req.query.name ;
-//     const [rows] = await db.query(`SELECT size FROM product WHERE product_name=${name}`)
-//     console.log(rows);
-//     res.json(rows);
-// })
 
 
 
@@ -220,20 +188,7 @@ router.get('/page/:prodcut_sid',async (req,res)=>{
 router.get('/size/:prodcut_sid',async (req,res)=>{
     let Psid = +req.params.prodcut_sid
     let str = `product_sid=${Psid} OR product_sid=${+Psid+1} OR product_sid=${+Psid+2} OR product_sid=${+Psid+3} OR product_sid=${+Psid+5} OR product_sid=${+Psid+6} OR product_sid=${+Psid+7}`
-    
-    // for (let i=0 ; i<=7 ; i++){
-    //     if(i=0){
-    //         str += `product_sid=${req.params.prodcut_sid} OR `
-    //     }
-    //     else if(i<7){
-            
-    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)} OR `
-    //     }else if(i=7){
-    //         str += `product_sid=${Number(req.params.prodcut_sid)+Number(i)}`
-    //     }
-    //     return
-    // }
-    // ${Sting((Number(req.params.prodcut_sid)+Number(1)))}
+
     const [rows] = await db.query(`SELECT size FROM product WHERE ${str}`)
 
     rows.map((v,i)=>{
