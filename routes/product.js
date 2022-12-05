@@ -133,7 +133,13 @@ router.post('/custom', upload.single("avatar"),async (req,res)=>{
 
 })
 
-
+// 評論 獲得"山高"、"評論留言"、"星數"
+//SELECT members.avatar,members.total_height,members.name,product_order.star,product_order.message,product_order.messageTime FROM (`product_order` join `order` on order.order_num = product_order.order_num) join members on order.member_sid = members.member_sid WHERE product_order.products_sid = ;
+router.get('/comment',async (req,res)=>{
+    let psid = req.body.product_sid
+    const [rows] = await db.query(`SELECT members.avatar,members.total_height,members.name,product_order.star,product_order.message,product_order.messageTime FROM \`product_order\` join \`order\` on order.order_num = product_order.order_num join members on order.member_sid = members.member_sid = ${psid}`)
+    res.json(rows);
+})
 
 
 
