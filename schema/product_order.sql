@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2022 年 11 月 30 日 17:02
+-- 產生時間： 2022 年 12 月 05 日 17:12
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -34,40 +34,31 @@ CREATE TABLE `product_order` (
   `size` varchar(255) NOT NULL,
   `qty` int(255) NOT NULL,
   `total` int(255) NOT NULL,
-  `img` varchar(255) NOT NULL,
+  `img` varchar(255) DEFAULT NULL,
   `star` int(11) DEFAULT NULL,
   `message` varchar(255) DEFAULT NULL,
   `messageTime` date DEFAULT NULL,
-  `created_time` datetime NOT NULL DEFAULT current_timestamp()
+  `created_time` datetime NOT NULL DEFAULT current_timestamp(),
+  `custom_img` varchar(10000) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 傾印資料表的資料 `product_order`
 --
 
-INSERT INTO `product_order` (`order_sid`, `order_num`, `products_sid`, `size`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
-(36, '20220922030642', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
-(37, '20220922030642', 17, '', 1, 2340, '', NULL, NULL, NULL, '2022-09-22 15:06:42'),
-(38, '20220922030749', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:07:49'),
-(39, '20220922030749', 17, '', 1, 2340, '', NULL, NULL, NULL, '2022-09-22 15:07:49'),
-(40, '20220922030751', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:07:51'),
-(41, '20220922030751', 17, '', 1, 2340, '', NULL, NULL, NULL, '2022-09-22 15:07:51'),
-(42, '20220922030753', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:07:53'),
-(43, '20220922030753', 17, '', 1, 2340, '', NULL, NULL, NULL, '2022-09-22 15:07:53'),
-(44, '20220922030900', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:09:00'),
-(45, '20220922030900', 17, '', 1, 2340, '', NULL, NULL, NULL, '2022-09-22 15:09:00'),
-(46, '20220922031127', 19, '', 1, 999, '', NULL, NULL, NULL, '2022-09-22 15:11:27'),
-(47, '20220923024833', 19, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 14:48:33'),
-(48, '20220923030059', 19, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 15:00:59'),
-(49, '20220923030059', 17, '', 4, 9360, '', NULL, NULL, NULL, '2022-09-23 15:00:59'),
-(50, '20220923035111', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 15:51:11'),
-(51, '20220923044421', 19, '', 1, 999, '', 5, '安安', '2022-11-30', '2022-11-30 00:28:41'),
-(52, '20220923044421', 17, '', 1, 2340, '', 5, '安安', '2022-11-30', '2022-11-30 12:05:59'),
-(53, '20220923044500', 17, '', 1, 2340, '', 5, '1111', '2022-11-30', '2022-11-30 00:30:08'),
-(68, '1669685741910', 50, 'S', 1, 2000, 'img', 4, '123', '2022-11-29', '2022-11-29 23:29:32'),
-(69, '1669685741910', 30, 'S', 1, 400, 'img', 5, '7777777', '2022-11-30', '2022-11-30 00:15:49'),
-(70, '1669690525756', 50, 'S', 1, 2000, 'img', 4, '超級保暖der', '2022-11-29', '2022-11-29 15:08:28'),
-(71, '1669690525756', 30, 'S', 1, 400, 'img', 4, '安安', '2022-11-29', '2022-11-29 22:23:44');
+INSERT INTO `product_order` (`order_sid`, `order_num`, `products_sid`, `size`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`, `custom_img`) VALUES
+(47, '20220923024833', 19, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 14:48:33', NULL),
+(48, '20220923030059', 19, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 15:00:59', NULL),
+(49, '20220923030059', 17, '', 4, 9360, '', NULL, NULL, NULL, '2022-09-23 15:00:59', NULL),
+(50, '20220923035111', 18, '', 1, 999, '', NULL, NULL, NULL, '2022-09-23 15:51:11', NULL),
+(72, '1670215279935', 350, 'US7', 1, 8010, '20221121174157737_2.png', NULL, NULL, NULL, '2022-12-05 12:41:45', NULL),
+(73, '1670215279935', 650, '', 1, 9450, '20220914151657701_2.png', NULL, NULL, NULL, '2022-12-05 12:41:45', NULL),
+(74, '1670215457617', 350, 'US7', 1, 8010, '20221121174157737_2.png', NULL, NULL, NULL, '2022-12-05 12:44:41', NULL),
+(75, '1670215457617', 650, '', 1, 9450, '20220914151657701_2.png', NULL, NULL, NULL, '2022-12-05 12:44:41', NULL),
+(76, '1670215720164', 639, '', 1, 6480, '20210120142116198_2.png', NULL, NULL, NULL, '2022-12-05 12:48:55', NULL),
+(77, '1670229354701', 205, 'S', 1, 26820, '20220923110044671_2.png', NULL, NULL, NULL, '2022-12-05 16:36:09', NULL),
+(78, '1670229354701', 205, 'M', 1, 26820, '20220923110044671_2.png', NULL, NULL, NULL, '2022-12-05 16:36:09', NULL),
+(79, '1670229354701', 719, 'S', 1, 2990, NULL, 4, '222', '2022-12-05', '2022-12-05 16:41:52', '7b6f3a83-1412-43b8-8dc2-d3c28b800c32.png');
 
 --
 -- 已傾印資料表的索引
@@ -87,7 +78,7 @@ ALTER TABLE `product_order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product_order`
 --
 ALTER TABLE `product_order`
-  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

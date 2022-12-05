@@ -31,7 +31,7 @@ router.post("/login/api", upload.none(), async (req, res) => {
   if (
     result[0] &&
     req.body.password &&
-    bcrypt.compare(req.body.password, result[0].password)
+    bcrypt.compareSync(req.body.password, result[0].password)
   ) {
     const token = jwt.sign({ member_sid: result[0].member_sid }, "hiking1214")
 
@@ -537,12 +537,14 @@ router.put("/api/pass", [auth, upload.none()], async (req, res) => {
 
   const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
 
+  const passBcrypt = bcrypt.hashSync(req.body.newPass, 10)
+
   const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
 
-  if (rows[0] && rows[0].password === req.body.password) {
+  if (rows[0] && bcrypt.compareSync(req.body.password, rows[0].password)) {
     const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
     const [result] = await db.query(sql, [
-      req.body.newPass,
+      passBcrypt,
       res.locals.loginUser.member_sid,
     ])
     if (result.affectedRows) output.success = true
@@ -665,24 +667,6 @@ router.put("/api", [auth, upload.single("avatar")], async (req, res) => {
   })
   .toFile(__dirname + "/../public/uploads/avatar_" + req.file.filename)
 
-  const sqlVer = "SELECT `password` from members WHERE member_sid = ?"
-
-  const passBcrypt = bcrypt.hashSync(req.body.newPass, 10)
-
-  const [rows] = await db.query(sqlVer, [res.locals.loginUser.member_sid])
-
-  if (rows[0] && bcrypt.compare(req.body.password, rows[0].password)) {
-    const sql = "UPDATE `members` SET `password`=? WHERE `member_sid` =?"
-    const [result] = await db.query(sql, [
-      passBcrypt,
-      res.locals.loginUser.member_sid,
-    ])
-    if (result.affectedRows) output.success = true
-    // console.log(result);
-    // console.log(result.affectedRows);
-  }
-
-  res.json(output)
   return res.json(output)
 })
 
