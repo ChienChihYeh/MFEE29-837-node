@@ -2,9 +2,9 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： localhost
--- 產生時間： 2022 年 12 月 06 日 19:56
--- 伺服器版本： 10.4.21-MariaDB
+-- 主機： 127.0.0.1
+-- 產生時間： 2022-12-07 00:41:19
+-- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `campaign_order`
 --
-
+DROP TABLE IF EXISTS `campaign_order`;
 CREATE TABLE `campaign_order` (
   `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
@@ -41,17 +41,6 @@ CREATE TABLE `campaign_order` (
   `messageTime` date DEFAULT NULL,
   `created_time` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- 傾印資料表的資料 `campaign_order`
---
-
-INSERT INTO `campaign_order` (`order_sid`, `order_num`, `campaign_sid`, `dayname`, `date_start`, `people`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
-(8, '20220923024833', 51, NULL, NULL, 0, 3600, '', NULL, NULL, NULL, '2022-09-23 14:48:33'),
-(9, '20220923025551', 50, NULL, NULL, 0, 2200, '', NULL, NULL, NULL, '2022-09-23 14:55:51'),
-(10, '20220923025620', 50, NULL, NULL, 0, 4400, '', 5, '555', '2022-11-29', '2022-11-29 23:31:01'),
-(12, '20220923030059', 43, NULL, NULL, 0, 24800, '', NULL, NULL, NULL, '2022-09-23 15:00:59'),
-(13, '20220923035111', 49, NULL, NULL, 0, 1500, '', NULL, NULL, NULL, '2022-09-23 15:51:11');
 
 --
 -- 已傾印資料表的索引
@@ -71,7 +60,7 @@ ALTER TABLE `campaign_order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `campaign_order`
 --
 ALTER TABLE `campaign_order`
-  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
