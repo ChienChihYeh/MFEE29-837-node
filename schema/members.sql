@@ -51,7 +51,7 @@ CREATE TABLE `members` (
 --
 
 INSERT INTO `members` (`member_sid`, `name`, `password`, `email`, `mobile`, `address`, `birthday`, `nickname`, `member_level`, `total_height`, `avatar`, `created_at`, `intro`, `token`, `verification`) VALUES
-(1, '阿儒', '$2b$10$SggwzWCMVDaewd6H7uT7YuXL4ks1NUDQUZo60QnpSWbjbhpnhwXf2', 'yiru@hiking.com', '', '', NULL, '阿儒', 1, 0, NULL, '2022-12-05 17:37:26', '', NULL, NULL),
+(1, '阿儒', '$2b$10$SggwzWCMVDaewd6H7uT7YuXL4ks1NUDQUZo60QnpSWbjbhpnhwXf2', 'yiru@hiking.com', '0987654321', '新北市新莊區', NULL, '阿儒', 1, 0, NULL, '2022-12-05 17:37:26', '爬山好有趣，歡迎各位山友來找我一起爬山唷～', NULL, NULL),
 (2, '力誠', '$2b$10$Za6fZxcQyi6nvKaLcMWoEepUnX8tR7crIxuqYD72gfkjVY28lIkVG', 'zx@hiking.com', '', '宜蘭市龜山島57巷10號1樓', NULL, 'ZX', 1, 0, '', '2022-12-05 17:39:29', '爬山好好玩，歡迎來一起爬山，增加抵抗力!!!', NULL, NULL),
 (3, '鎧維', '$2b$10$Z3uQ6Ja2rp5J7z3tvtAI.uWRhSSewcb3sh2e.0V2VEpIwFtpAGqyi', 'wei@hiking.com', '', '', NULL, '貝果三號', 1, 0, NULL, '2022-12-05 17:40:43', '', NULL, NULL),
 (4, '恩齊', '$2b$10$wzBGlL/pb87Y0LxQjqBFEeD2Ib/zOY5m/joqKkPyhXqZtjKpYGSey', 'n7@hiking.com', '', '', NULL, 'N7', 1, 0, NULL, '2022-12-05 17:41:32', '', NULL, NULL),
