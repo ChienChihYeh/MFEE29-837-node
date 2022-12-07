@@ -47,7 +47,7 @@ router.get("/api", async (req, res) => {
 
   //活動
   const childOrder4 =
-    "SELECT * FROM `order`join `campaign_order` on order.order_num = campaign_order.order_num join campaign on campaign_order.campaign_sid= campaign.sid where order.member_sid=?";
+    "SELECT * FROM `order`join `campaign_order` on order.order_num = campaign_order.order_num join campaign on campaign_order.campaign_sid= campaign.c_sid where order.member_sid=?";
   [camRows] = await db.query(childOrder4, [req.query.sid]);
   res.json({
     rows: rows,
@@ -117,30 +117,34 @@ router.get("/pay/confirm", async (req, res) => {
       ]);
       if (pro) {
         for (let i = 0; i < pro.length; i++) {
-          if( pro[i].sid == 719 ||  pro[i].sid == 720 ||  pro[i].sid == 721 ||  pro[i].sid == 722 ){
+          if (
+            pro[i].sid == 719 ||
+            pro[i].sid == 720 ||
+            pro[i].sid == 721 ||
+            pro[i].sid == 722
+          ) {
             const proOrder =
-            "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `custom_img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
-          const [proRows] = await db.query(proOrder, [
-            orderId,
-            pro[i].sid,
-            pro[i].size || "",
-            pro[i].quantity,
-            pro[i].quantity * pro[i].price,
-            pro[i].img,
-          ]);
-          }else{
+              "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `custom_img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+            const [proRows] = await db.query(proOrder, [
+              orderId,
+              pro[i].sid,
+              pro[i].size || "",
+              pro[i].quantity,
+              pro[i].quantity * pro[i].price,
+              pro[i].img,
+            ]);
+          } else {
             const proOrder =
-            "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
-          const [proRows] = await db.query(proOrder, [
-            orderId,
-            pro[i].sid,
-            pro[i].size || "",
-            pro[i].quantity,
-            pro[i].quantity * pro[i].price,
-            pro[i].img,
-          ]);
+              "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+            const [proRows] = await db.query(proOrder, [
+              orderId,
+              pro[i].sid,
+              pro[i].size || "",
+              pro[i].quantity,
+              pro[i].quantity * pro[i].price,
+              pro[i].img,
+            ]);
           }
-          
         }
       }
       if (room) {
@@ -324,7 +328,7 @@ router.get("/lookEva", async (req, res) => {
   }
   if (req.query.campSid !== undefined) {
     const sql =
-      "SELECT * FROM `campaign_order` join campaign on campaign_order.campaign_sid=campaign.sid WHERE campaign_order.order_sid=?";
+      "SELECT * FROM `campaign_order` join campaign on campaign_order.campaign_sid=campaign.c_sid WHERE campaign_order.order_sid=?";
     const [rows] = await db.query(sql, [req.query.campSid]);
     res.json(rows);
   }
