@@ -18,19 +18,20 @@ router.get("/borad/api", async (req, res) => {
     if(req.query.mid){
         let mid = req.query.mid;
         let mStr = 'member_sid = ';
-        const sql = 'SELECT follows.follow_sid FROM `members` join `follows` on members.member_sid = follows.member_sid  WHERE members.member_sid = ?'
+        const sql = 'SELECT follows.member_sid FROM `members` join `follows` on members.member_sid = follows.follow_sid  WHERE members.member_sid = ?'
         const [rows] = await db.query(sql, mid)
     
+        console.log(rows);
         if(rows.length > 0){
 
         const FollowsId = rows.map((v, i) => {
             
             if(rows.length===1 || i===0){
-                mStr += `${v.follow_sid}`
+                mStr += `${v.member_sid}`
             }else if(i!==0 && rows.length+1 !== i){
-                mStr += ` OR member_sid = ${v.follow_sid}`
+                mStr += ` OR member_sid = ${v.member_sid}`
             }else if(i === rows.length+1){
-                mStr +=`${v.follow_sid} ORDER BY total_height DESC`
+                mStr +=`${v.member_sid} ORDER BY total_height DESC`
             }
           })
     
@@ -136,9 +137,11 @@ router.post('/custom', upload.single("avatar"),async (req,res)=>{
 // 評論 獲得"山高"、"評論留言"、"星數"
 //SELECT members.avatar,members.total_height,members.name,product_order.star,product_order.message,product_order.messageTime FROM (`product_order` join `order` on order.order_num = product_order.order_num) join members on order.member_sid = members.member_sid WHERE product_order.products_sid = ;
 router.get('/comment',async (req,res)=>{
-    let psid = req.body.product_sid
-    const [rows] = await db.query(`SELECT members.avatar,members.total_height,members.name,product_order.star,product_order.message,product_order.messageTime FROM \`product_order\` join \`order\` on order.order_num = product_order.order_num join members on order.member_sid = members.member_sid = ${psid}`)
-    res.json(rows);
+    let pid = req.query.pid
+    const [rows] = await db.query(`SELECT members.member_sid,members.avatar,members.total_height,members.nickname,product_order.star,product_order.message,product_order.messageTime FROM \`product_order\` join \`order\` on order.order_num = product_order.order_num join members on order.member_sid = members.member_sid WHERE product_order.products_sid = ${pid}`)
+    const [rows2] = await db.query(`SELECT ROUND(SUM(product_order.star)/COUNT(product_order.star),1) as avgStar FROM \`product_order\` join \`order\` on order.order_num = product_order.order_num join members on order.member_sid = members.member_sid WHERE product_order.products_sid = ${pid}`)
+    console.log(rows2);
+    res.json({rows:rows,rows2:rows2});
 })
 
 

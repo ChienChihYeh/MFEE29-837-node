@@ -9,6 +9,13 @@ router.get('/list',async (req,res)=>{
     const [M1rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=3 LIMIT 4')
     const [M2rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=40 LIMIT 4')
     const [M3rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=5 LIMIT 4')
+
+
+//     SELECT * FROM t1
+// LEFT JOIN t2 ON t1.id = t2.id
+// UNION
+// SELECT * FROM t1
+// RIGHT JOIN t2 ON t1.id = t2.id
     res.json({
         rows:rows,
         M1rows:M1rows,
