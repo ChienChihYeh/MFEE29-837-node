@@ -137,7 +137,7 @@ router.post("/forgotPass/api", upload.none(), async (req, res) => {
   const [result] = await db.query(sql, [req.body.email.toLowerCase()])
 
   if (!result[0]) {
-    return res.json("帳號不存在")
+    return res.json({message: "密碼重置信已寄出"})
   }
 
   const token = jwt.sign(
@@ -168,7 +168,7 @@ router.post("/forgotPass/api", upload.none(), async (req, res) => {
     }
   )
 
-  return res.json(token)
+  return res.json({message: "密碼重置信已寄出", token: token})
 })
 
 router.post("/resetPass/api", upload.none(), async(req, res)=> {
