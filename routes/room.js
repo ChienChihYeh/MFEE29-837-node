@@ -5,12 +5,15 @@ const upload = require(__dirname + '/../modules/upload-img')
 
 //訂房主頁面
 router.get('/list',async (req,res)=>{
-    const [rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid')
-    const [M1rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=3 LIMIT 4')
-    const [M2rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=40 LIMIT 4')
-    const [M3rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=5 LIMIT 4')
+    // LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid
+
+    // const [rows] = await db.query('SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid')
+    const [M1rows] = await db.query('SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.mountain_sid=3 GROUP BY room.room_sid ORDER BY booking_order.star DESC LIMIT 4')
+    const [M2rows] = await db.query('SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.mountain_sid=40 GROUP BY room.room_sid ORDER BY booking_order.star DESC LIMIT 4')
+    const [M3rows] = await db.query('SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.mountain_sid=5 GROUP BY room.room_sid ORDER BY booking_order.star DESC LIMIT 4')
+
     res.json({
-        rows:rows,
+        // rows:rows,
         M1rows:M1rows,
         M2rows:M2rows,
         M3rows:M3rows,
@@ -42,7 +45,8 @@ router.get('/searchbar/getlocation',async (req,res)=>{
 //SearchBar SELECT連動下方卡片
 router.get('/searchbar/getroom',async (req,res)=>{
     const {mountain_sid}=req.query
-    const [roomRows] = await db.query(`SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=${mountain_sid} LIMIT 4`) 
+   
+    const [roomRows] = await db.query(`SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.mountain_sid=${mountain_sid} GROUP BY room.room_sid ORDER BY booking_order.star DESC LIMIT 4`) 
    
     res.json({
         roomRows:roomRows,
@@ -56,9 +60,7 @@ router.get('/searchbar/namegetroom',async (req,res)=>{
     // console.log(req.params.selectRoom)
     // console.log(req.params.roomname)
     const [roomRows] = await db.query(
-        `SELECT * FROM room 
-        JOIN mountain on room.mountain_sid=mountain.mountain_sid 
-        JOIN location ON room.location_sid=location.sid WHERE room.mountain_sid=${mountain} AND room.room_name LIKE '%${roomname}%'`)
+        `SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid  WHERE room.mountain_sid=${mountain} AND room.room_name LIKE '%${roomname}%' GROUP BY room.room_sid ORDER BY booking_order.star`)
    
     res.json({
         roomRows:roomRows,
@@ -82,8 +84,8 @@ router.get('/searchbar/getmountain',async (req,res)=>{
 //SearchBar SELECT連動下方卡片
 router.get('/searchbar/FageGetRoom',async (req,res)=>{
     const {mountain_sid}=req.query
-    const [roomRows] = await db.query(`SELECT * FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.mountain_sid=${mountain_sid}`) 
-   
+    const [roomRows] = await db.query(`SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid  WHERE room.mountain_sid=${mountain_sid} GROUP BY room.room_sid ORDER BY booking_order.star DESC`) 
+
     res.json({
         selRoomRows:roomRows,
         });
@@ -92,10 +94,8 @@ router.get('/searchbar/FageGetRoom',async (req,res)=>{
 //房間細節內頁
 router.get('/getRoomDetail/:room_sid', async (req, res)=>{
     const {room_sid} = req.params 
-    const [rows] = await db.query(`SELECT * FROM room 
-    JOIN mountain ON room.mountain_sid=mountain.mountain_sid 
-    JOIN location ON location.sid=room.location_sid 
-    WHERE room_sid=${room_sid}`);
+    const [rows] = await db.query(`SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
+    
 
     rows[0].room_imgs =rows[0].room_imgs.split(',')
     rows[0].room_service_sid =rows[0].room_service_sid.split(',')
@@ -113,6 +113,30 @@ router.get('/coupon',async (req,res)=>{
    
     res.json({
         couponRows:couponRows,
+        });
+})
+//PO文data
+
+router.get('/post',async (req,res)=>{
+
+    let sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `members` ON posts.member_sid = members.member_sid ORDER BY posts.post_sid DESC LIMIT 8"
+    const [postRows] = await db.query(sql) 
+   
+    res.json({
+        postRows:postRows,
+        });
+})
+  //一日單攻活動data
+
+router.get('/oneday',async (req,res)=>{
+
+    let sql = "SELECT * FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid WHERE campaign.sid=36"
+    const [onedayRows] = await db.query(sql) 
+    onedayRows[0].brife_describe =onedayRows[0].brife_describe.split('。')[1]
+
+
+    res.json({
+        onedayRows:onedayRows,
         });
 })
 
