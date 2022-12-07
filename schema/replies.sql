@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- 資料表結構 `replies`
 --
 
+DROP TABLE IF EXISTS `replies`;
 CREATE TABLE `replies` (
   `sid` int(11) NOT NULL,
   `post_sid` int(11) NOT NULL,

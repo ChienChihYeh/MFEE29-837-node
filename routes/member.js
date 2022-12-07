@@ -6,10 +6,9 @@ const fs = require("fs")
 const jwt = require("jsonwebtoken")
 const { dirname } = require("path")
 const sharp = require("sharp")
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt")
 const { auth } = require(__dirname + "/../modules/auth.js")
-
-//TODO bcrypt測試
+const nodemailer = require("nodemailer")
 
 // router.get("/api", async (req, res) => {
 //   const sql = `SELECT * FROM members WHERE member_sid = ?`;
@@ -43,7 +42,6 @@ router.post("/login/api", upload.none(), async (req, res) => {
   res.json(output)
 })
 
-
 //註冊
 router.post("/join/api", upload.none(), async (req, res) => {
   // res.json(req.body);
@@ -67,22 +65,26 @@ router.post("/join/api", upload.none(), async (req, res) => {
     return res.json(output)
   }
 
-  if(!req.body.email.match(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/)){
+  if (
+    !req.body.email.match(
+      /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+    )
+  ) {
     output.error = ": 電子信箱格式錯誤"
     return res.json(output)
   }
 
-  if(req.body.mobile && !req.body.mobile.match(/^09\d{2}-?\d{3}-?\d{3}$/)) {
+  if (req.body.mobile && !req.body.mobile.match(/^09\d{2}-?\d{3}-?\d{3}$/)) {
     output.error = ": 手機號碼格式錯誤"
     return res.json(output)
   }
 
-  if(!req.body.password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)){
+  if (!req.body.password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)) {
     output.error = ": 密碼格式錯誤"
     return res.json(output)
   }
 
-  if(req.body.birthday && isNaN(new Date(req.body.birthday))) {
+  if (req.body.birthday && isNaN(new Date(req.body.birthday))) {
     output.error = ": 生日格式錯誤"
     return res.json(output)
   }
@@ -127,6 +129,83 @@ router.post("/join/api", upload.none(), async (req, res) => {
   }
 
   res.json(output)
+})
+
+router.post("/forgotPass/api", upload.none(), async (req, res) => {
+  const sql = "SELECT * FROM `members` WHERE `email` = ?"
+
+  const [result] = await db.query(sql, [req.body.email.toLowerCase()])
+
+  if (!result[0]) {
+    return res.json("帳號不存在")
+  }
+
+  const token = jwt.sign(
+    { member_sid: result[0].member_sid },
+    "hiking1214" + result[0].password
+  )
+
+  // const verifiedToken = jwt.verify(token, "hiking1214" + result[0].password)
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    auth: {
+      user: "gohiking837@gmail.com",
+      pass: "aumabmmefhbnvljl",
+    },
+  })
+
+  transporter.sendMail(
+    {
+      from: "gohiking837@gmail.com",
+      to: req.body.email.toLowerCase(),
+      subject: "[837]會員密碼重設",
+      text: `您好\n\n請點選下列網址，完成密碼重設的手續。\n\nhttp://localhost:3000/resetPass?token=${token}&mid=${result[0].member_sid}\n\n■ 若您未曾在837設定本電子郵件帳號，這表示其他用戶很可能輸入錯誤的信箱帳號，\n導致系統傳送本封郵件至此信箱內。\n請直接刪除本封郵件即可。`,
+    },
+    (err) => {
+      console.log("寄件錯誤:" + err)
+    }
+  )
+
+  return res.json(token)
+})
+
+router.post("/resetPass/api", upload.none(), async(req, res)=> {
+  const sqlCheckOldPass = "SELECT * FROM `members` WHERE `member_sid` = ?"
+
+  const [result] = await db.query(sqlCheckOldPass, [req.query.mid.toLowerCase()])
+
+  if (!result[0] || !result[0].password) {
+    return res.json({message: "帳號不存在"})
+  }
+
+  let jwtInfo = {}
+
+  try {jwt.verify(req.query.token, "hiking1214" + result[0].password)}
+  catch {
+    return res.json({message: "重置密碼連結無效"})
+  }
+
+  jwtInfo = jwt.verify(req.query.token, "hiking1214" + result[0].password)
+
+  if (bcrypt.compareSync(req.body.newPass, result[0].password)) {
+    return res.json({message: "新密碼不可與目前密碼相同"})
+  }
+
+  const newPassBcrypt = bcrypt.hashSync(req.body.newPass, 10)
+
+  const sqlNewPass = "UPDATE `members` SET `password` = ? WHERE `member_sid` = ?"
+
+  const [resultM] = await db.query(sqlNewPass, [newPassBcrypt, jwtInfo.member_sid])
+
+  if(resultM) {
+    const token = jwt.sign({ member_sid: jwtInfo.member_sid }, "hiking1214")
+    return res.json({message: "密碼重置成功", token: token})
+  }
+
+  return res.json({message: "密碼重置失敗"})
+  // res.json(`token: ${req.query.token} | mid: ${req.query.mid} | new pass : ${req.body.newPass}`)
 })
 
 router.post(
@@ -528,7 +607,7 @@ router.put("/api/pass", [auth, upload.none()], async (req, res) => {
     //for debug
   }
 
-  if(!req.body.newPass.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)){
+  if (!req.body.newPass.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)) {
     output.error = ": 密碼格式錯誤"
     return res.json(output)
   }
@@ -569,21 +648,25 @@ router.put("/api", [auth, upload.single("avatar")], async (req, res) => {
     return res.json(output)
   }
 
-  if(!req.body.email.match(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/)){
+  if (
+    !req.body.email.match(
+      /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+    )
+  ) {
     output.error = ": 電子信箱格式錯誤"
     return res.json(output)
   }
 
-  if(req.body.mobile && !req.body.mobile.match(/^09\d{2}-?\d{3}-?\d{3}$/)) {
+  if (req.body.mobile && !req.body.mobile.match(/^09\d{2}-?\d{3}-?\d{3}$/)) {
     output.error = ": 手機號碼格式錯誤"
     return res.json(output)
   }
 
-  if(req.body.birthday && isNaN(new Date(req.body.birthday))) {
+  if (req.body.birthday && isNaN(new Date(req.body.birthday))) {
     output.error = ": 生日格式錯誤"
     return res.json(output)
   }
-  
+
   let mid = 0
 
   if (res.locals.loginUser) {
@@ -597,16 +680,16 @@ router.put("/api", [auth, upload.single("avatar")], async (req, res) => {
     req.body.email.toLowerCase()
   )
 
-  rowsCheckMail.map((v, i)=>{
-    if(v.member_sid !== mid){
+  rowsCheckMail.map((v, i) => {
+    if (v.member_sid !== mid) {
       output.error = ": 信箱已註冊"
     }
-  }) 
-  
-  if(output.error === ": 信箱已註冊"){
+  })
+
+  if (output.error === ": 信箱已註冊") {
     return res.json(output)
   }
-    
+
   const sql =
     "UPDATE `members` SET `name`=?,`email`=?,`mobile`=?,`address`=?,`birthday`=?,`nickname`=?, `avatar`=?, `intro`=? WHERE `member_sid` =?"
 
@@ -656,16 +739,16 @@ router.put("/api", [auth, upload.single("avatar")], async (req, res) => {
 
   if (result.affectedRows) output.success = true
 
-  if(!req.file) {
+  if (!req.file) {
     return res.json(output)
   }
 
   await sharp(req.file.path)
-  .resize({
-    fit: sharp.fit.contain,
-    width: 200,
-  })
-  .toFile(__dirname + "/../public/uploads/avatar_" + req.file.filename)
+    .resize({
+      fit: sharp.fit.contain,
+      width: 200,
+    })
+    .toFile(__dirname + "/../public/uploads/avatar_" + req.file.filename)
 
   return res.json(output)
 })
