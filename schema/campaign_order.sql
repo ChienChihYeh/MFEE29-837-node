@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-12-07 00:41:32
+-- 產生時間： 2022-12-07 00:41:19
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -24,20 +24,16 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- 資料表結構 `rental_order`
+-- 資料表結構 `campaign_order`
 --
-DROP TABLE IF EXISTS `rental_order`;
-CREATE TABLE `rental_order` (
+DROP TABLE IF EXISTS `campaign_order`;
+CREATE TABLE `campaign_order` (
   `order_sid` int(11) NOT NULL,
   `order_num` varchar(255) NOT NULL,
-  `rental_sid` int(11) NOT NULL,
-  `store_out` varchar(255) DEFAULT NULL COMMENT '(租)',
-  `store_back` varchar(255) DEFAULT NULL COMMENT '(還)',
-  `out_date` date DEFAULT NULL,
-  `back_date` date DEFAULT NULL,
-  `day` int(11) NOT NULL,
-  `deliveryFee` int(11) NOT NULL COMMENT '跨店費用',
-  `qty` int(255) NOT NULL,
+  `campaign_sid` int(11) NOT NULL,
+  `dayname` varchar(255) DEFAULT NULL,
+  `date_start` date DEFAULT NULL,
+  `people` int(255) NOT NULL,
   `total` int(255) NOT NULL,
   `img` varchar(255) NOT NULL,
   `star` int(11) DEFAULT NULL,
@@ -51,9 +47,9 @@ CREATE TABLE `rental_order` (
 --
 
 --
--- 資料表索引 `rental_order`
+-- 資料表索引 `campaign_order`
 --
-ALTER TABLE `rental_order`
+ALTER TABLE `campaign_order`
   ADD PRIMARY KEY (`order_sid`);
 
 --
@@ -61,9 +57,9 @@ ALTER TABLE `rental_order`
 --
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `rental_order`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `campaign_order`
 --
-ALTER TABLE `rental_order`
+ALTER TABLE `campaign_order`
   MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
