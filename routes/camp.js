@@ -35,7 +35,7 @@ router.get('/:sid',async (req,res)=>{
   where ='WHERE 1'
   console.log(sid)
   if(sid){
-    where = `WHERE campaign.sid=${sid}`;
+    where = `WHERE campaign.c_sid=${sid}`;
   }
   console.log(where)
     const [rows] = await db.query(`SELECT * FROM \`campaign\` JOIN \`location\` ON \`campaign\`.\`location_sid\` =\`location\`.\`sid\` JOIN \`mountain\` ON \`campaign\`.\`mountain_sid\` =\`mountain\`.\`mountain_sid\` ${where}`)

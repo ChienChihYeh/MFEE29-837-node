@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2022 年 12 月 07 日 15:04
+-- 產生時間： 2022 年 12 月 07 日 15:45
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -26,9 +26,10 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `campaign`
 --
+
 DROP TABLE IF EXISTS `campaign`;
 CREATE TABLE `campaign` (
-  `sid` int(255) NOT NULL,
+  `c_sid` int(255) NOT NULL,
   `camp_name` varchar(255) NOT NULL,
   `location_sid` int(30) NOT NULL,
   `mountain_sid` int(100) NOT NULL,
@@ -50,7 +51,7 @@ CREATE TABLE `campaign` (
 -- 傾印資料表的資料 `campaign`
 --
 
-INSERT INTO `campaign` (`sid`, `camp_name`, `location_sid`, `mountain_sid`, `campaign_days_sid`, `campaign_type_sid`, `price`, `camp_startdate`, `camp_joinenddate`, `brife_describe`, `schedule_day1`, `schedule_day2`, `schedule_day3`, `qty`, `mainImage`, `detailImages`) VALUES
+INSERT INTO `campaign` (`c_sid`, `camp_name`, `location_sid`, `mountain_sid`, `campaign_days_sid`, `campaign_type_sid`, `price`, `camp_startdate`, `camp_joinenddate`, `brife_describe`, `schedule_day1`, `schedule_day2`, `schedule_day3`, `qty`, `mainImage`, `detailImages`) VALUES
 (1, '南橫三星 - 新手難度報名兩天兩夜規劃', 7, 120, 2, 1, 1200, '2022-12-15', '2023-02-28', '你見過南橫之美嗎？\n自從2009年8月，南橫公路中斷之後，美麗的南橫三星便淪為黑山、少有人探訪，直到最近才又終於開放了許多山友鍾情的南橫三星！\n塔關山、關山嶺山、庫哈諾辛山皆為A級百岳，是適合當日來回的平易、絕美山嶺，封閉多年的原始森林風華更甚以往，台灣368還安排了專車接送往返民宿及各登山口，讓你飽覽南橫的沿線風光、更讓你輕鬆的入手三座百岳。\n穿梭在巨木參天的鐵杉林中、將炎熱的暑氣全數隔絕在外，美麗的自然景觀、雲海、山稜線，就這樣在山中靜靜的等著你的拜訪。', 'Day1\n05:30 起床用早餐\n06:30 上車出發\n08:00 大關山隧道口 關山嶺山登山口起登\n09:30 登頂關山嶺山\n10:30 關山嶺山登山口上車\n11:00 塔關山登山口起登\n13:30 登頂塔關山（午餐自理）\n16:00 塔關山登山口\n17:30 返抵民宿', 'Day2\n05:30 起床用早餐\n06:30 上車出發\n08:00 進涇橋起登\n10:30 庫哈諾辛山屋\n12:00 登頂庫哈諾辛山（午餐自理）\n14:30 庫哈諾辛山屋\n16:00 進涇橋上車返程\n 19:30 高雄左營高鐵站解散', '', 0, 'campmain1.jpg', 'campdetail1.jpg, campdetail2.jpg, campdetail3.jpg'),
 (2, '玉山前峰免抽籤 - 登頂玉山的行前訓練 一日單攻初階難度', 7, 2, 1, 1, 1280, '2022-12-15', '2023-02-28', '玉山前峰標高3239公尺，位於玉山西峰西側尾稜，是很受歡迎的入門百岳行程，擁有270度的良好展望。從塔塔加登山口出發，經孟祿亭到2.7K處即為玉山前峰的登山口，此處距離峰頂只有800公尺，卻需花費超過一小時步程，惡名昭彰的亂石陡坡讓人腿軟，難怪叉路口路牌上會被寫上『很難爬』三個字，是挑戰玉山主峰前最好的訓練場。', 'Day1\n\n05:30 嘉義火車站前站集合出發（早餐自理）\n\n08:00 上東埔停車場整裝出發\n\n08:30 入園報導/搭乘園區接駁車(自費)\n\n09:00 塔塔加登山口起登\n\n10:30 2.7K玉山前鋒登山口\n\n 12:30 玉山前峰 H3239（午餐自理）\n\n14:30 玉山前鋒登山口\n\n16:00 塔塔加登山口\n\n16:30 上東埔停車場上車回程\n\n19:30 嘉義火車站前站解散', '', '', 0, 'campmain2.jpg', 'campdetail4.jpg, campdetail5.jpg, campdetail6.jpg'),
 (3, '閂山鈴鳴 - 代辦入園申請三天兩夜初階難度非單攻', 14, 34, 3, 1, 1200, '2022-12-15', '2023-02-28', '閂山、鈴鳴山是中央山脈北二段縱走中會遇到的兩座百岳\n\n相較於無明山與甘薯峰，閂山和鈴鳴山的路線格外的清晰、沒有險峻的危崖或太過困難的地形、也不需在暗夜中踩跨大石頭渡溪\n\n他們擁有的是和緩柔美的高山草原、純粹的原始樹林、蒼勁矗立的鐵杉樹群\n\n360度全景的遼闊展望和沿途相伴的南湖、中央、無明、甘薯、鋸齒、奇萊的山脈稜線\n\n遍佈在730高海拔林道中的原生種紅葉植物，每到季節就落了滿地、化作腳下鮮豔的紅地毯的美麗景色\n\n更成了許多攝影人眼中的楓紅秘境，幽靜的等待人們的探訪', 'Day 1\n06:00 台北車站西三門集合出發\n08:30 南山部落便利商店休息\n11:00 730林道11.7K行車終點（整裝起登） \n12:30 16K廢棄機車（午餐自理）\n16:30 25K工寮紮營休息 \n17:30 晚餐', 'Day 2\n05:30 早餐（協作提供）\n06:30 出發鈴鳴山\n08:30 27.5K鈴鳴山登山口\n10:30 鈴鳴山（午餐自理）\n11:30 出發返程\n14:30 返回25K工寮\n17:30 晚餐', 'Day 3\n05:00 早餐（協作提供）\n06:00 整裝出發\n07:00 閂山登山口（輕裝登頂）\n09:00 登頂閂山\n10:00 出發返程\n11:00 回到閂山登山口（午餐自理）\n11:30 出發返程 \n16:00 11.7K行車終點上車 \n18:30 南山部落 \n21:30 台北車站西三門解散', 0, 'campmain3.jpg', 'campdetail7.jpg, campdetail8.jpg, campdetail9.jpg'),
@@ -100,7 +101,7 @@ INSERT INTO `campaign` (`sid`, `camp_name`, `location_sid`, `mountain_sid`, `cam
 -- 資料表索引 `campaign`
 --
 ALTER TABLE `campaign`
-  ADD PRIMARY KEY (`sid`);
+  ADD PRIMARY KEY (`c_sid`);
 
 --
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
@@ -110,7 +111,7 @@ ALTER TABLE `campaign`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `campaign`
 --
 ALTER TABLE `campaign`
-  MODIFY `sid` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `c_sid` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- 已傾印資料表的限制式
