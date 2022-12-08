@@ -253,6 +253,149 @@ router.get("/pay/confirm", async (req, res) => {
     res.end();
   }
 });
+router.post("/cardPay", async (req, res) => {
+  const { pro, room, camp, ren, memberSid, totalPrice, pay, user, orderId } =
+    req.body;
+  const sql =
+    "INSERT INTO `order`(`order_num`, `member_sid`, `total`, `recipient`, `recipient_address`, `recipient_phone`, `payment`, `remark`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+  const [rows] = await db.query(sql, [
+    orderId,
+    memberSid,
+    totalPrice,
+    user.name,
+    user.address,
+    user.mobile,
+    pay,
+    user.text,
+  ]);
+  if (pro) {
+    for (let i = 0; i < pro.length; i++) {
+      if (
+        pro[i].sid == 719 ||
+        pro[i].sid == 720 ||
+        pro[i].sid == 721 ||
+        pro[i].sid == 722
+      ) {
+        const proOrder =
+          "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `custom_img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+        const [proRows] = await db.query(proOrder, [
+          orderId,
+          pro[i].sid,
+          pro[i].size || "",
+          pro[i].quantity,
+          pro[i].quantity * pro[i].price,
+          pro[i].img,
+        ]);
+      } else {
+        const proOrder =
+          "INSERT INTO `product_order`(`order_num`, `products_sid`, `size`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,NOW())";
+        const [proRows] = await db.query(proOrder, [
+          orderId,
+          pro[i].sid,
+          pro[i].size || "",
+          pro[i].quantity,
+          pro[i].quantity * pro[i].price,
+          pro[i].img,
+        ]);
+      }
+    }
+  }
+  if (room) {
+    for (let i = 0; i < room.length; i++) {
+      const roomOrder =
+        "INSERT INTO `booking_order`(`order_num`, `room_sid`, `start`, `end`, `day`,`qty`, `total`, `img`, `created_time`) VALUES (?,?,?,?,?,?,?,?,NOW())";
+      const [roomRows] = await db.query(roomOrder, [
+        orderId,
+        room[i].sid,
+        room[i].startDate,
+        room[i].endDate,
+        room[i].day,
+        room[i].quantity,
+        room[i].quantity * room[i].price * room[i].day,
+        room[i].img,
+      ]);
+    }
+  }
+  if (ren) {
+    for (let i = 0; i < ren.length; i++) {
+      const renOrder =
+        "INSERT INTO `rental_order`(`order_num`, `rental_sid`, `store_out`, `store_back`, `out_date`, `back_date`,`day`, `deliveryFee`, `qty`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())";
+      const renRows = await db.query(renOrder, [
+        orderId,
+        ren[i].sid,
+        ren[i].out,
+        ren[i].back,
+        ren[i].start,
+        ren[i].end,
+        ren[i].day,
+        ren[i].deliveryFee,
+        ren[i].quantity,
+        ren[i].quantity * ren[i].price * ren[i].day + ren[i].deliveryFee,
+        ren[i].img,
+      ]);
+    }
+  }
+  if (camp) {
+    for (let i = 0; i < camp.length; i++) {
+      const campOrder =
+        "INSERT INTO `campaign_order`(`order_num`, `campaign_sid`,dayname, `date_start`,  `people`, `total`, `img`,`created_time`) VALUES (?,?,?,?,?,?,?,NOW())";
+      const campRows = await db.query(campOrder, [
+        orderId,
+        camp[i].sid,
+        camp[i].dayname,
+        camp[i].startDate,
+        camp[i].quantity,
+        camp[i].quantity * camp[i].price,
+        camp[i].img,
+      ]);
+    }
+  }
+  const [whoUser] = await db.query(
+    `SELECT nickname FROM members WHERE member_sid=${memberSid}`
+  );
+  if (rows.affectedRows) {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      auth: {
+        user: MAIL_USERNAME,
+        pass: MAIL_PASSWORD,
+      },
+    });
+    transporter
+      .sendMail({
+        from: "gohiking837@gmail.com",
+        to: "buyuser1214@gmail.com",
+        subject: "訂單成立通知信",
+        html: `<div class="container" style='width: 500px; height: 500px;
+        border: 1px solid black;
+        border-radius: 10px;
+        overflow: hidden;'>
+                <div class="imgWrap" style='width: 500px;
+                height: 200px;
+                background-color: #01170d;
+                border-bottom: 1px solid black;'>
+                  <img src=${PHOTO} alt="" style="width: 100%;
+                  height: 100%;
+                  object-fit: contain;">
+                </div>
+                  <p style='font-size: 20px;
+                  margin-left: 5px;'>親愛的：<span style='font-weight: 700;'>${
+                    whoUser[0].nickname
+                  }</span>，感謝您的購買</p>
+                  <p style='font-size: 20px;
+                  margin-left: 5px;'>您的訂單編號為：${orderId}</p>
+                  <p style='font-size: 20px;
+                  margin-left: 5px;'>訂單總金額：${moneyFormat(totalPrice)}</p>
+                  <p style='font-size: 20px;
+                  margin-left: 5px;'>詳細訂單連結：http://localhost:3000/member/orders</p>
+              </div>`,
+      })
+      .then((res) => {})
+      .catch(console.error);
+  }
+  res.json(rows);
+});
 //寫評價
 router.post("/writeEvaPro", async (req, res) => {
   const { sid, text, star } = req.body;
