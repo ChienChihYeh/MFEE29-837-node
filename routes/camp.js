@@ -29,6 +29,13 @@ router.get('/level',async (req,res)=>{
   res.json(rows);
 })
 
+//評價資料
+router.get('/comm',async (req,res)=>{
+  const [rows] = await db.query('SELECT * FROM `campaign` JOIN `campaign_type` ON `campaign`.`campaign_type_sid` =`campaign_type`.`camptype_sid` JOIN `campaign_days` ON `campaign`.`campaign_days_sid` = `campaign_days`.`campday_sid` JOIN `campaign_order` ON `campaign`.`c_sid` = `campaign_order`.`campaign_sid`' )
+    res.json(rows);
+})
+
+
 //camp_sid 細節頁
 router.get('/:sid',async (req,res)=>{
   let sid = req.params.sid ? req.params.sid.trim() : '';
