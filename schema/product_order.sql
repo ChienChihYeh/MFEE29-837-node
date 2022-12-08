@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-12-07 00:41:27
+-- 產生時間： 2022-12-07 17:33:43
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -42,6 +42,18 @@ CREATE TABLE `product_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- 傾印資料表的資料 `product_order`
+--
+
+INSERT INTO `product_order` (`order_sid`, `order_num`, `products_sid`, `size`, `qty`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
+(1, '1670377450811', 142, 'M', 2, 15360, '20220907184132871_2.png', 4, '藍色超好看Der，爬七星山都不會冷，超讚的配送速度！！！', '2022-12-07', '2022-12-07 09:45:31'),
+(2, '1670382498231', 142, 'L', 1, 7680, '20220907184132871_2.png', 5, '爬山必備的吧！\n賣家出貨很快，Pchome 24H沒兩樣\n一定推薦朋友來買\n5星好評！！！', '2022-12-07', '2022-12-07 11:10:49'),
+(3, '1670382867744', 142, 'L', 1, 7680, '20220907184132871_2.png', 4, '買給男友穿~\n他說還行，下次考慮回購', '2022-12-07', '2022-12-07 11:19:07'),
+(4, '1670403974992', 142, 'M', 1, 7680, '20220907184132871_2.png', 4, '質感很好，雖然小貴，但實用', '2022-12-07', '2022-12-07 17:07:35'),
+(5, '1670404435644', 142, 'M', 1, 7680, '20220907184132871_2.png', 5, '這東西實屬牛B，雙擊給個讚', '2022-12-07', '2022-12-07 17:14:40'),
+(6, '1670404595916', 142, 'L', 1, 7680, '20220907184132871_2.png', 5, '防水度很好，不用撐傘都可以行走江湖', '2022-12-07', '2022-12-07 17:17:22');
+
+--
 -- 已傾印資料表的索引
 --
 
@@ -59,7 +71,7 @@ ALTER TABLE `product_order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `product_order`
 --
 ALTER TABLE `product_order`
-  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
