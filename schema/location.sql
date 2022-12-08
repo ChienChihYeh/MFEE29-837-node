@@ -28,7 +28,6 @@ SET time_zone = "+00:00";
 --
 
 DROP TABLE IF EXISTS `location`;
-
 CREATE TABLE `location` (
   `sid` int(100) NOT NULL,
   `name` varchar(100) NOT NULL
