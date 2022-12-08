@@ -94,7 +94,7 @@ router.get('/searchbar/FageGetRoom',async (req,res)=>{
 //房間細節內頁
 router.get('/getRoomDetail/:room_sid', async (req, res)=>{
     const {room_sid} = req.params 
-    const [rows] = await db.query(`SELECT room.*, mountain.*, location.*, booking_order.star,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
+    const [rows] = await db.query(`SELECT room.*, mountain.*, location.*, booking_order.* ,SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
     
 
     rows[0].room_imgs =rows[0].room_imgs.split(',')
@@ -133,6 +133,7 @@ router.get('/oneday',async (req,res)=>{
     let sql = "SELECT * FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid WHERE campaign.sid=36"
     const [onedayRows] = await db.query(sql) 
     onedayRows[0].brife_describe =onedayRows[0].brife_describe.split('。')[1]
+    onedayRows[0].detailImages =onedayRows[0].detailImages.split('。')
 
 
     res.json({
