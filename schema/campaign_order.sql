@@ -2,9 +2,9 @@
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： 127.0.0.1
--- 產生時間： 2022-12-07 00:41:19
--- 伺服器版本： 10.5.17-MariaDB
+-- 主機： localhost
+-- 產生時間： 2022 年 12 月 08 日 16:24
+-- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -43,6 +43,16 @@ CREATE TABLE `campaign_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- 傾印資料表的資料 `campaign_order`
+--
+
+INSERT INTO `campaign_order` (`order_sid`, `order_num`, `campaign_sid`, `dayname`, `date_start`, `people`, `total`, `img`, `star`, `message`, `messageTime`, `created_time`) VALUES
+(1, '1670486554273', 7, '一日遊', '2022-12-23', 3, 3840, 'campmain2.jpg', 5, '超刺激的合歡山 推推！', '2022-12-08', '2022-12-08 16:15:09'),
+(2, '1670486554273', 14, '三天兩夜', '2022-12-09', 1, 1200, 'campmain3.jpg', 5, '有導遊帶真的比較好玩', '2022-12-08', '2022-12-08 16:15:29'),
+(3, '1670486554273', 40, '一日遊', '2022-12-10', 7, 3500, 'campmain40.jpg', 4, '一天跟大家認識，真有趣呀', '2022-12-08', '2022-12-08 16:15:53'),
+(4, '1670486554273', 36, '一日遊', '2022-12-10', 12, 5400, 'campmain36.jpg', 4, '有嚮導帶我們爬刺激的路線！大推呀', '2022-12-08', '2022-12-08 16:16:21');
+
+--
 -- 已傾印資料表的索引
 --
 
@@ -60,7 +70,7 @@ ALTER TABLE `campaign_order`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `campaign_order`
 --
 ALTER TABLE `campaign_order`
-  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
