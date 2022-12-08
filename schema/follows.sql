@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2022-12-05 18:12:07
+-- 產生時間： 2022-12-08 15:30:27
 -- 伺服器版本： 10.5.17-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -31,6 +31,24 @@ CREATE TABLE `follows` (
   `member_sid` int(11) NOT NULL,
   `follow_sid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 傾印資料表的資料 `follows`
+--
+
+INSERT INTO `follows` (`member_sid`, `follow_sid`) VALUES
+(1, 3),
+(1, 6),
+(2, 3),
+(2, 6),
+(3, 2),
+(3, 6),
+(4, 3),
+(4, 6),
+(5, 3),
+(5, 6),
+(6, 2),
+(6, 3);
 
 --
 -- 已傾印資料表的索引

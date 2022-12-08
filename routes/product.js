@@ -190,10 +190,22 @@ router.get('/size/:prodcut_sid',async (req,res)=>{
 
     const [rows] = await db.query(`SELECT size FROM product WHERE ${str}`)
 
-    rows.map((v,i)=>{
-        return v.shoseChose = false
+
+    const newSize = rows.map((v)=> {
+        return v.newS =  +v.size.substring(2,6)
     })
-    res.json(rows);
+    const sort = [...newSize]
+    
+    sort.sort((a,b)=>{
+        return a - b 
+    } )
+
+    const sss = sort.map((v)=>{
+        return 'US'+v 
+    })
+
+   console.log(sss);
+    res.json(sss);
 })
 
 module.exports = router;
