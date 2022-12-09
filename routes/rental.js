@@ -115,6 +115,20 @@ router.get("/getDetailData/:sid", async (req, res) => {
   res.json(await getDetailData(req));
 });
 
+// 評論 獲得"山高"、"評論留言"、"星數"
+//SELECT members.avatar,members.total_height,members.name,product_order.star,product_order.message,product_order.messageTime FROM (`product_order` join `order` on order.order_num = product_order.order_num) join members on order.member_sid = members.member_sid WHERE product_order.products_sid = ;
+router.get("/comment", async (req, res) => {
+  let sid = req.query.sid;
+  const [rows] = await db.query(
+    `SELECT members.member_sid,members.avatar,members.total_height,members.nickname,rental_order.star,rental_order.message,rental_order.messageTime FROM \`rental_order\` join \`order\` on order.order_num = rental_order.order_num join members on order.member_sid = members.member_sid WHERE rental_order.rental_sid = ${sid}`
+  );
+  const [rows2] = await db.query(
+    `SELECT ROUND(SUM(rental_order.star)/COUNT(rental_order.star),1) as avgStar FROM \`rental_order\` join \`order\` on order.order_num = rental_order.order_num join members on order.member_sid = members.member_sid WHERE rental_order.rental_sid = ${sid}`
+  );
+  console.log(rows2);
+  res.json({ rows: rows, rows2: rows2 });
+});
+
 //細節頁店點
 async function getStore(req) {
   const sql = `SELECT * FROM store`;
