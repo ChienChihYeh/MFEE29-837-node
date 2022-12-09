@@ -366,7 +366,7 @@ router.get("/reply/api", async (req, res) => {
   const pid = req.query.pid
 
   const sql =
-    "SELECT replies.context, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+    "SELECT replies.context, replies.datetime, replies.sid, replies.post_sid, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
 
   const [rows] = await db.query(sql, pid)
 
@@ -408,6 +408,30 @@ router.delete("/like/api", async (req, res) => {
   if (resultP.affectedRows) output.success = true
 
   res.json(output)
+})
+
+router.delete("/reply/api", auth, async (req, res) => {
+  const pid = req.query.pid
+  const sid = req.query.sid
+  const output = {
+    update: false,
+    success: false,
+  }
+
+  const sql = "DELETE FROM `replies` WHERE `sid` = ?"
+
+  const [result] = await db.query(sql, sid)
+
+  if (result.affectedRows) output.update = true
+  
+  const sqlP = "UPDATE `posts` SET `comments` = `comments` - 1 WHERE `post_sid` = ?"
+
+  const [resultP] = await db.query(sqlP, pid)
+
+  if (resultP.affectedRows) output.success = true
+
+  res.json(output)
+
 })
 
 router.delete("/follow/api", auth, async (req, res) => {
