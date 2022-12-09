@@ -26,6 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `rental`
 --
+<<<<<<< HEAD
 DROP TABLE IF EXISTS `rental`;
 CREATE TABLE `rental` (
   `sid` int(11) NOT NULL,
@@ -39,6 +40,19 @@ CREATE TABLE `rental` (
   `rental_specification` text NOT NULL,
   `rental_introdution` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+=======
+
+DROP TABLE IF EXISTS `store`;
+CREATE TABLE `store` (
+  `store_sid` int(11) NOT NULL,
+  `store_name` varchar(255) NOT NULL,
+  `store_address_zone` varchar(255) NOT NULL,
+  `store_address` varchar(255) NOT NULL,
+  `delivery_fee_level` int(11) NOT NULL,
+  `store_img` varchar(255) DEFAULT NULL,
+  `store_introduction` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+>>>>>>> b720ba8117b28db7155a801c2cfdbe41386a3d3d
 
 --
 -- 傾印資料表的資料 `rental`

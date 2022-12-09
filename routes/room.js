@@ -97,20 +97,21 @@ router.get('/getRoomDetail/:room_sid', async (req, res)=>{
     const [rows] = await db.query(`
     SELECT room.*, mountain.*, location.*, members.*, \`order\`.*, booking_order.*, SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid JOIN  \`order\` ON booking_order.order_sid= \`order\`.order_sid JOIN members ON  \`order\`.member_sid=members.member_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
     
-    // const [rowsNoComment] = await db.query(`
-    // SELECT room.*, mountain.*, location.*, FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`)
+    const [rowsNoComment] = await db.query(`
+    SELECT *  FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.room_sid=${room_sid}`)
 
 
-    rows[0].room_imgs =rows[0].room_imgs.split(',')
-    rows[0].room_service_sid =rows[0].room_service_sid.split(',')
+    rows.length >0 && (rows[0].room_imgs =rows[0].room_imgs.split(','))
+    rows.length >0 && (rows[0].room_service_sid =rows[0].room_service_sid.split(','))
     
-    // rowsNoComment[0].room_imgs =rowsNoComment[0].room_imgs.split(',')
-    // rowsNoComment[0].room_service_sid =rowsNoComment[0].room_service_sid.split(',')
+    rows.length <=0 && rowsNoComment.length>0 && (rowsNoComment[0].room_imgs =rowsNoComment[0].room_imgs.split(','))
+    rows.length <=0 && rowsNoComment.length>0 && (rowsNoComment[0].room_service_sid =rowsNoComment[0].room_service_sid.split(','))
 
 
 
     res.json({
-        rows:rows,
+        rows:[...rows,rowsNoComment[0]],
+        rowsNoComment:rowsNoComment,
         });
 });
 
@@ -128,7 +129,7 @@ router.get('/coupon',async (req,res)=>{
 
 router.get('/post',async (req,res)=>{
 
-    let sql = "SELECT * FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `members` ON posts.member_sid = members.member_sid ORDER BY posts.post_sid DESC LIMIT 8"
+    let sql = "SELECT `posts`.*, `mountain`.*, `location`.*, `members`.avatar, `members`.nickname, `members`.total_height, `members`.member_level FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `members` ON posts.member_sid = members.member_sid ORDER BY posts.post_sid DESC LIMIT 8"
     const [postRows] = await db.query(sql) 
    
     res.json({
@@ -139,10 +140,10 @@ router.get('/post',async (req,res)=>{
 
 router.get('/oneday',async (req,res)=>{
 
-    let sql = "SELECT * FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid WHERE campaign.sid=36"
+    let sql = "SELECT * FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid WHERE campaign.c_sid=36"
     const [onedayRows] = await db.query(sql) 
     onedayRows[0].brife_describe =onedayRows[0].brife_describe.split('。')[1]
-    onedayRows[0].detailImages =onedayRows[0].detailImages.split('。')
+    onedayRows[0].detailImages =onedayRows[0].detailImages.split(', ')
 
 
     res.json({

@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `product`
 --
-DROP TABLE IF EXISTS `product_order`;
+DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `product_sid` int(11) NOT NULL,
   `product_name` varchar(255) NOT NULL,
