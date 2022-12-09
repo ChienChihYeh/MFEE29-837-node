@@ -31,14 +31,14 @@ router.get("/borad/api", async (req, res) => {
             }else if(i!==0 && rows.length+1 !== i){
                 mStr += ` OR member_sid = ${v.member_sid}`
             }else if(i === rows.length+1){
-                mStr +=`${v.member_sid} ORDER BY total_height DESC`
+                mStr +=`${v.member_sid} ORDER BY members.total_height DESC`
             }
           })
     
           let reg =/\'|’|‘/g
           let a =mStr.replace(reg,"")
           
-          let  sql2 = `SELECT * FROM members WHERE ${a}`
+          let  sql2 = `SELECT * FROM members WHERE ${a} ORDER BY members.total_height DESC`
           console.log(req.query.search);
           
         
