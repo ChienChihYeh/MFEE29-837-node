@@ -297,12 +297,13 @@ router.post("/reply/api", [auth, upload.none()], async (req, res) => {
   }
 
   const sql =
-    "INSERT INTO `replies`(`post_sid`, `member_sid`, `context`) VALUES (?, ?, ?)"
+    "INSERT INTO `replies`(`post_sid`, `member_sid`, `context`, `parent_sid`) VALUES (?, ?, ?, ?)"
 
   const [result] = await db.query(sql, [
     req.body.post_sid,
     req.body.member_sid,
     req.body.context,
+    req.body.sid !== '0'? req.body.sid : null
   ])
 
   if (result.affectedRows) output.update = true
@@ -366,7 +367,7 @@ router.get("/reply/api", async (req, res) => {
   const pid = req.query.pid
 
   const sql =
-    "SELECT replies.context, replies.datetime, replies.sid, replies.post_sid, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
+    "SELECT replies.context, replies.datetime, replies.parent_sid, replies.sid, replies.post_sid, members.member_sid, members.total_height, members.nickname, members.avatar FROM `replies` JOIN `members` on replies.member_sid = members.member_sid WHERE replies.post_sid = ?"
 
   const [rows] = await db.query(sql, pid)
 
