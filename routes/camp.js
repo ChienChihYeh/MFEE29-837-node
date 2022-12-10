@@ -29,12 +29,29 @@ router.get('/level',async (req,res)=>{
   res.json(rows);
 })
 
+//活動報名人數
+router.get('/joinnum',async (req,res)=>{
+  let cid = req.query.cid
+  const [rows] = await db.query(`SELECT SUM(\`campaign_order\`.\`people\`) as pnum FROM \`campaign\`  JOIN  \`campaign_order\` ON \`campaign\`.\`c_sid\` = \`campaign_order\`.\`campaign_sid\` WHERE \`campaign\`.\`c_sid\` = ${cid}`)
+      res.json(rows);
+})
+
 //評價資料
 router.get('/comm',async (req,res)=>{
   const [rows] = await db.query('SELECT * FROM `campaign` JOIN `campaign_type` ON `campaign`.`campaign_type_sid` =`campaign_type`.`camptype_sid` JOIN `campaign_days` ON `campaign`.`campaign_days_sid` = `campaign_days`.`campday_sid` JOIN `campaign_order` ON `campaign`.`c_sid` = `campaign_order`.`campaign_sid`' )
     res.json(rows);
 })
 
+//評論 獲得"山高"、"評論留言"、"星數"
+router.get('/comment',async (req,res)=>{
+  let cid = req.query.cid
+  //rows = "會員的評論留言跟會員的累積高度"
+  const [rows] = await db.query(`SELECT members.member_sid,members.avatar,members.total_height,members.nickname,campaign_order.star,campaign_order.message,campaign_order.messageTime FROM \`campaign_order\` join \`order\` on order.order_num = campaign_order.order_num join members on order.member_sid = members.member_sid WHERE campaign_order.campaign_sid = ${cid}`)
+  //rows2 = "星數"
+  const [rows2] = await db.query(`SELECT ROUND(SUM(campaign_order.star)/COUNT(campaign_order.star),1) as avgStar FROM \`campaign_order\` join \`order\` on order.order_num = campaign_order.order_num join members on order.member_sid = members.member_sid WHERE campaign_order.campaign_sid = ${cid}`)
+  console.log(rows2);
+  res.json({rows:rows,rows2:rows2});
+})
 
 //camp_sid 細節頁
 router.get('/:sid',async (req,res)=>{
