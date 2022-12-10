@@ -288,7 +288,7 @@ router.post("/like/api", [auth, upload.none()], async (req, res) => {
 
   res.json(output)
 })
-
+  
 router.post("/reply/api", [auth, upload.none()], async (req, res) => {
   // res.json(req.body)
   const output = {
@@ -303,7 +303,7 @@ router.post("/reply/api", [auth, upload.none()], async (req, res) => {
     req.body.post_sid,
     req.body.member_sid,
     req.body.context,
-    req.body.sid !== '0'? req.body.sid : null
+    req.body.sid? req.body.sid : null
   ])
 
   if (result.affectedRows) output.update = true
