@@ -272,6 +272,15 @@ router.post("/like/api", [auth, upload.none()], async (req, res) => {
   const mid = req.body.mid
   const pid = req.body.pid
 
+  const sqlV = "SELECT * FROM `likes` WHERE `member_sid` = ? AND `post_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, pid]) 
+
+  if(rows[0]) {
+    return res.json(output)
+  }
+
+
   const sql = "INSERT INTO `likes`(`member_sid`, `post_sid`) VALUES (?,?)"
 
   const [result] = await db.query(sql, [mid, pid])
@@ -394,6 +403,14 @@ router.delete("/like/api", async (req, res) => {
   const output = {
     update: false,
     success: false,
+  }
+
+  const sqlV = "SELECT * FROM `likes` WHERE `member_sid` = ? AND `post_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, pid]) 
+
+  if(!rows[0]) {
+    return res.json(output)
   }
 
   const sql = "DELETE FROM `likes` WHERE member_sid = ? AND post_sid = ?"
