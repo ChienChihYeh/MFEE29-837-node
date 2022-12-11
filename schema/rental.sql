@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： localhost
--- 產生時間： 2022 年 12 月 07 日 16:51
+-- 產生時間： 2022 年 12 月 11 日 10:54
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 7.4.29
 
@@ -27,7 +27,6 @@ SET time_zone = "+00:00";
 -- 資料表結構 `rental`
 --
 
-DROP TABLE IF EXISTS `rental`;
 CREATE TABLE `rental` (
   `sid` int(11) NOT NULL,
   `rental_category` varchar(255) NOT NULL,

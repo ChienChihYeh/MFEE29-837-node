@@ -107,13 +107,19 @@ router.get("/searchbar/FageGetRoom", async (req, res) => {
 });
 
 //房間細節內頁
-router.get("/getRoomDetail/:room_sid", async (req, res) => {
-  const { room_sid } = req.params;
-  const [rows] = await db.query(`
-    SELECT room.*, mountain.*, location.*, members.*, \`order\`.*, booking_order.*, SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid JOIN  \`order\` ON booking_order.order_num= \`order\`.order_num JOIN members ON  \`order\`.member_sid=members.member_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`);
+router.get('/getRoomDetail/:room_sid', async (req, res)=>{
+    const {room_sid} = req.params 
+    // const [rows] = await db.query(`
+    // SELECT room.*, mountain.*, \`location\`.sid, \`location\`.name AS location_name, members.*, \`order\`.*, booking_order.*, SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid JOIN  \`order\` ON booking_order.order_sid= \`order\`.order_sid JOIN members ON  \`order\`.member_sid=members.member_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
 
-  const [rowsNoComment] = await db.query(`
-    SELECT *  FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.room_sid=${room_sid}`);
+    const [rows] = await db.query(`
+    SELECT room.*, mountain.*, \`location\`.sid, \`location\`.name AS location_name, members.*, \`order\`.*, booking_order.*, SUM(booking_order.star)/COUNT(booking_order.star) as Average, COUNT(booking_order.star) as commentQty FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid LEFT JOIN booking_order ON room.room_sid=booking_order.room_sid JOIN  \`order\` ON booking_order.order_num= \`order\`.order_num JOIN members ON  \`order\`.member_sid=members.member_sid WHERE room.room_sid=${room_sid} GROUP BY room.room_sid ORDER BY booking_order.star`) ;
+    
+    const [rowsForComment] = await db.query(`
+    SELECT * FROM booking_order JOIN \`order\` ON booking_order.order_num= \`order\`.order_num JOIN members ON \`order\`.member_sid=members.member_sid WHERE booking_order.room_sid=${room_sid}`) ;
+    
+    const [rowsNoComment] = await db.query(`
+    SELECT room.*, mountain.*, location.sid, location.name AS location_name FROM room JOIN mountain on room.mountain_sid=mountain.mountain_sid JOIN location ON location.sid=room.location_sid WHERE room.room_sid=${room_sid}`)
 
   rows.length > 0 && (rows[0].room_imgs = rows[0].room_imgs.split(","));
   rows.length > 0 &&
@@ -127,10 +133,11 @@ router.get("/getRoomDetail/:room_sid", async (req, res) => {
     (rowsNoComment[0].room_service_sid =
       rowsNoComment[0].room_service_sid.split(","));
 
-  res.json({
-    rows: [...rows, rowsNoComment[0]],
-    rowsNoComment: rowsNoComment,
-  });
+    res.json({
+        rows:[...rows,rowsNoComment[0]],
+        rowsForComment:rowsForComment,
+        rowsNoComment:rowsNoComment,
+        });
 });
 
 //爬山折價券
@@ -145,23 +152,24 @@ router.get("/coupon", async (req, res) => {
 });
 //PO文data
 
-router.get("/post", async (req, res) => {
-  let sql =
-    "SELECT `posts`.*, `mountain`.*, `location`.*, `members`.avatar, `members`.nickname, `members`.total_height, `members`.member_level FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `members` ON posts.member_sid = members.member_sid ORDER BY posts.post_sid DESC LIMIT 8";
-  const [postRows] = await db.query(sql);
+router.get('/post',async (req,res)=>{
 
-  res.json({
-    postRows: postRows,
-  });
-});
-//一日單攻活動data
+    let sql = "SELECT `posts`.*, `mountain`.*, `location`.sid, `location`.name as location_name, `members`.* FROM `posts` JOIN `mountain` ON posts.mountain_sid = mountain.mountain_sid JOIN `location` ON mountain.location_sid = location.sid JOIN `members` ON posts.member_sid = members.member_sid ORDER BY posts.post_sid DESC LIMIT 8"
+    const [postRows] = await db.query(sql) 
+   
+    res.json({
+        postRows:postRows,
+        });
+})
+  //一日單攻活動data
 
-router.get("/oneday", async (req, res) => {
-  let sql =
-    "SELECT * FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid WHERE campaign.c_sid=36";
-  const [onedayRows] = await db.query(sql);
-  onedayRows[0].brife_describe = onedayRows[0].brife_describe.split("。")[1];
-  onedayRows[0].detailImages = onedayRows[0].detailImages.split(", ");
+router.get('/oneday',async (req,res)=>{
+
+    let sql = "SELECT campaign.*, mountain.*, location.*, campaign_order.* ,SUM(campaign_order.people) as totalPeople FROM `campaign` JOIN `mountain` ON campaign.mountain_sid = mountain.mountain_sid JOIN `location` ON location.sid = campaign.location_sid JOIN `campaign_order` ON campaign.c_sid = campaign_order.campaign_sid WHERE campaign.c_sid=36"
+    const [onedayRows] = await db.query(sql) 
+    onedayRows[0].brife_describe =onedayRows[0].brife_describe.split('。')[1]
+    onedayRows[0].detailImages =onedayRows[0].detailImages.split(', ')
+
 
   res.json({
     onedayRows: onedayRows,
