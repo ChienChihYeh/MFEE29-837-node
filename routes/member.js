@@ -341,6 +341,15 @@ router.post("/follow/api", auth, async (req, res) => {
     return res.json(output)
   }
 
+  const sqlV = "SELECT * FROM `follows` WHERE `member_sid` = ? AND `follow_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, fid]) 
+
+  if(rows[0]) {
+    return res.json(output)
+  }
+
+
   const sql = "INSERT INTO `follows`(`member_sid`, `follow_sid`) VALUES (?, ?)"
 
   const [result] = await db.query(sql, [mid, fid])
@@ -457,6 +466,14 @@ router.delete("/follow/api", auth, async (req, res) => {
   const fid = res.locals.loginUser.member_sid
   const output = {
     success: false,
+  }
+
+  const sqlV = "SELECT * FROM `follows` WHERE `member_sid` = ? AND `follow_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, fid]) 
+
+  if(!rows[0]) {
+    return res.json(output)
   }
 
   const sql = "DELETE FROM `follows` WHERE member_sid = ? AND follow_sid = ?"
