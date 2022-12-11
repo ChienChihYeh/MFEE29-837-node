@@ -32,8 +32,13 @@ router.get('/level',async (req,res)=>{
 //活動報名人數
 router.get('/joinnum',async (req,res)=>{
   let cid = req.query.cid
-  const [rows] = await db.query(`SELECT SUM(\`campaign_order\`.\`people\`) as pnum FROM \`campaign\`  JOIN  \`campaign_order\` ON \`campaign\`.\`c_sid\` = \`campaign_order\`.\`campaign_sid\` WHERE \`campaign\`.\`c_sid\` = ${cid}`)
-      res.json(rows);
+  
+  // const [rows] = await db.query(`SELECT SUM(\`campaign_order\`.\`people\`) as pnum FROM \`campaign\`  JOIN  \`campaign_order\` ON \`campaign\`.\`c_sid\` = \`campaign_order\`.\`campaign_sid\` WHERE \`campaign\`.\`c_sid\` = ${cid}`)
+  //     res.json(rows);
+  const [rows] = await db.query(`SELECT \`campaign_order\`.\`campaign_sid\`,\`campaign_order\`.\`people\` as pnum FROM \`campaign\`  JOIN  \`campaign_order\` ON \`campaign\`.\`c_sid\` = \`campaign_order\`.\`campaign_sid\` ORDER BY \`campaign_order\`.\`campaign_sid\` `)
+  res.json(rows)
+  
+  
 })
 
 //評價資料
