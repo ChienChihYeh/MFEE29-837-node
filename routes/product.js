@@ -67,7 +67,7 @@ router.get("/borad/api", async (req, res) => {
 
   router.get("/borad/api3", async (req, res) => {
     let search = req.query.search
-    const sql = `SELECT * FROM members WHERE name LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
+    const sql = `SELECT * FROM members WHERE nickname LIKE ${ db.escape('%'+search+'%') } ORDER BY total_height DESC LIMIT 10`
     const [rows] = await db.query(sql)
     console.log(rows);
     res.json(rows)
