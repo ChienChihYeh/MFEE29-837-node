@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- 資料表結構 `store`
 --
-
+DROP TABLE IF EXISTS `store`;
 CREATE TABLE `store` (
   `store_sid` int(11) NOT NULL,
   `store_name` varchar(255) NOT NULL,
