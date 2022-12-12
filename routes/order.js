@@ -396,6 +396,36 @@ router.post("/cardPay", async (req, res) => {
   }
   res.json(rows);
 });
+router.post("/TapPay", async (req, res) => {
+  const { prime } = req.body;
+  const post_data = {
+    prime: prime,
+    partner_key:
+      "partner_6ID1DoDlaPrfHw6HBZsULfTYtDmWs0q0ZZGKMBpp4YICWBxgK97eK3RM",
+    merchant_id: "GlobalTesting_CTBC",
+    amount: 1,
+    currency: "TWD",
+    details: "An apple and a pen.",
+    cardholder: {
+      phone_number: "+886923456789",
+      name: "jack",
+      email: "buyuser1214@gmail.com",
+    },
+    remember: false,
+  };
+  const TapPayRes = await axios.post(
+    "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime",
+    post_data,
+    {
+      headers: {
+        "x-api-key":
+          "partner_6ID1DoDlaPrfHw6HBZsULfTYtDmWs0q0ZZGKMBpp4YICWBxgK97eK3RM",
+      },
+    }
+  );
+  // console.log(TapPayRes);
+  res.json(TapPayRes.data);
+});
 //寫評價
 router.post("/writeEvaPro", async (req, res) => {
   const { sid, text, star } = req.body;
@@ -425,29 +455,6 @@ router.post("/writeEvaCamp", async (req, res) => {
   const [rows] = await db.query(sql, [star, text, sid]);
   res.json(rows);
 });
-// router.get("/mail", (req, res) => {
-//   const transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     port: 465,
-//     auth: {
-//       user: MAIL_USERNAME,
-//       pass: MAIL_PASSWORD,
-//     },
-//   });
-
-//   transporter
-//     .sendMail({
-//       from: "gohiking837@gmail.com",
-//       to: "buyuser1214@gmail.com",
-//       subject: "訂單成立通知信",
-//       html: "<h1>訂單已成立</h1><p>訂單編號：0000000</p>",
-//     })
-//     .then((res) => {
-//       console.log({ res });
-//     })
-//     .catch(console.error);
-// });
-
 //看評價
 router.get("/lookEva", async (req, res) => {
   if (req.query.proSid !== undefined) {
