@@ -272,6 +272,15 @@ router.post("/like/api", [auth, upload.none()], async (req, res) => {
   const mid = req.body.mid
   const pid = req.body.pid
 
+  const sqlV = "SELECT * FROM `likes` WHERE `member_sid` = ? AND `post_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, pid]) 
+
+  if(rows[0]) {
+    return res.json(output)
+  }
+
+
   const sql = "INSERT INTO `likes`(`member_sid`, `post_sid`) VALUES (?,?)"
 
   const [result] = await db.query(sql, [mid, pid])
@@ -331,6 +340,15 @@ router.post("/follow/api", auth, async (req, res) => {
   if (`${mid}` === `${fid}`) {
     return res.json(output)
   }
+
+  const sqlV = "SELECT * FROM `follows` WHERE `member_sid` = ? AND `follow_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, fid]) 
+
+  if(rows[0]) {
+    return res.json(output)
+  }
+
 
   const sql = "INSERT INTO `follows`(`member_sid`, `follow_sid`) VALUES (?, ?)"
 
@@ -396,6 +414,14 @@ router.delete("/like/api", async (req, res) => {
     success: false,
   }
 
+  const sqlV = "SELECT * FROM `likes` WHERE `member_sid` = ? AND `post_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, pid]) 
+
+  if(!rows[0]) {
+    return res.json(output)
+  }
+
   const sql = "DELETE FROM `likes` WHERE member_sid = ? AND post_sid = ?"
 
   const [result] = await db.query(sql, [mid, pid])
@@ -440,6 +466,14 @@ router.delete("/follow/api", auth, async (req, res) => {
   const fid = res.locals.loginUser.member_sid
   const output = {
     success: false,
+  }
+
+  const sqlV = "SELECT * FROM `follows` WHERE `member_sid` = ? AND `follow_sid` = ?"
+
+  const [rows] = await db.query(sqlV, [mid, fid]) 
+
+  if(!rows[0]) {
+    return res.json(output)
   }
 
   const sql = "DELETE FROM `follows` WHERE member_sid = ? AND follow_sid = ?"
